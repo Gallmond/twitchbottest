@@ -1,3 +1,8 @@
+Last thing I was doing:
+- fixed ping/ping. 
+- Now suss out how the listening functions will work
+- Then make the User listener make the list of active users
+
 Chatbot loop pseudo
 
 =============================== main:

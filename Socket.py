@@ -2,16 +2,25 @@ import socket
 from Settings import HOST, PORT, PASS, IDENT, CHANNEL
 # from Helpers import throttler
 
-def botSocket():
+class botSocket():
 
+	activeSocket = "hiya"
 
 	def __init__(self):
 		print("botSocket init start")
 		self.activeSocket = socket.socket()
 		self.activeSocket.connect((HOST, PORT))
+		print("< PASS " + PASS)
+		self.activeSocket.send(("PASS " + PASS + "\r\n").encode(encoding='utf-8'))
+		print("< NICK " + IDENT)
+		self.activeSocket.send(("NICK " + IDENT + "\r\n").encode(encoding='utf-8'))
+		print("< JOIN #" + CHANNEL)
+		self.activeSocket.send(("JOIN #" + CHANNEL + "\r\n").encode(encoding='utf-8'))
+
 		# while connection
 		readbuffer = ""
 		Loading = True
+		print("listening for connection")
 		while Loading:
 			readbuffer = readbuffer + self.activeSocket.recv(1024).decode("utf-8")
 			temp = readbuffer.split("\n")
@@ -20,38 +29,53 @@ def botSocket():
 			for line in temp:
 				print("> "+str(line))
 				if("End of /NAMES list" in line):
-					Loading = True;
-					self.send("Successfully joined chat")
+					Loading = False;
+					print("< PRIVMSG #" + CHANNEL + " : Bot joined chat")
+					
 		# while connecting end
+		print("connected")
 
-		self.identifySelf()
-		self.requestPermissions()
+		#self.requestPermissions()
 		print("botSocket init end")
+		self.activeSocket.send(("PRIVMSG #" + CHANNEL + " : Bot joined chat\r\n").encode(encoding='utf-8'))
 
-	def identifySelf():
-		self.send(("PASS " + PASS + "\r\n").encode(encoding='utf-8'))
-		self.send(("NICK " + IDENT + "\r\n").encode(encoding='utf-8'))
-		self.send(("JOIN #" + CHANNEL + "\r\n").encode(encoding='utf-8'))
-		return True
+	def getSocket(self):
+		return self.activeSocket
 
-	def requestPermissions():
+	def requestPermissions(self):
 		permissions = ["commands","membership","tags"]
 		for p in permissions:
-			self.send(("CAP REQ :twitch.tv/"+p+"\r\n").encode(encoding='utf-8'))
+			self.send(("CAP REQ :twitch.tv/"+p))
 		return True
 
-	def sendMessage(_msg): # send message to channel
+	def sendMessage(self, _msg): # send message to channel
 		messageTemp = "PRIVMSG #" + CHANNEL + " :" + _msg
 		self.send(messageTemp)
 		return True
 
-	def send(_msg): # print then send directly to socket
+	def send(self, _msg): # print then send directly to socket
 		print("< "+str(_msg))
-		self.activeSocket.send(_msg)
+
+		# add trailing return line if missing
+		if(_msg.find("\r\n")!=len(_msg)-len("\r\n")):
+			_msg+="\r\n"
+
+		self.activeSocket.send((_msg+"\r\n").encode(encoding='utf-8'))
 		return True
 
 
-
+# OLD BELOW =====================================================================
+# OLD BELOW =====================================================================
+# OLD BELOW =====================================================================
+# OLD BELOW =====================================================================
+# OLD BELOW =====================================================================
+# OLD BELOW =====================================================================
+# OLD BELOW =====================================================================
+# OLD BELOW =====================================================================
+# OLD BELOW =====================================================================
+# OLD BELOW =====================================================================
+# OLD BELOW =====================================================================
+# OLD BELOW =====================================================================
 
 
 def openSocket():

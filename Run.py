@@ -8,21 +8,25 @@ from Initialize import joinRoom
 # the loop (this will skip following functions)
 listeningFunctions = [] 
 
+
+
+botObject = botSocket()
+
+s = botObject.getSocket()
+# joinRoom(s)
+
+
 # prevent timeouts
 listeningFunctions.append(pingPong)
 
-activeBotSocket = botSocket()
-print(activeBotSocket)
+# request permissions
+botObject.requestPermissions()
 
-s = activeBotSocket.activeSocket
-# joinRoom(s)
 readbuffer = ""
-
 startTime = time.time();
-
 while True:
 	readbuffer = readbuffer + s.recv(1024).decode("utf-8")
-	temp = readbuffer.split("\n")
+	temp = readbuffer.split("\r\n")
 	readbuffer = temp.pop()		
 
 	for line in temp:
@@ -38,5 +42,5 @@ while True:
 		message = getMessage(line)
 		print ()
 		if "You Suck" in message:
-			s.sendMessage("No, you suck!")
+			botObject.sendMessage("No, you suck!")
 			break

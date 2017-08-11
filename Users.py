@@ -6,6 +6,8 @@ import time
 
 from Settings import USER_STARTING_POINTS
 
+
+
 class Users():
 	
 	allUsers = [] # [guid, User]

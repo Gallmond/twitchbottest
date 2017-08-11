@@ -2,14 +2,33 @@ import time
 import uuid
 import sys
 
-class testc():
-	def __init__(self):
-		self.s = "wpw"
+
+s = "bbbbb\r\n"
+
+print(s.find("\r"))
+
+# s = "some string with newline \r\n"
+
+# print(len(s))
+# print(len(s)-len("\r\n"))
+# print(s.index("\r\n"))
+
+# id
+
+# if(1 != 2):
+# 	print(False)
+
+
+# class testc():
+# 	def __init__(self):
+# 		self.s = "wpw"
 		
 
-b = testc()
+# b = testc()
 
-print(b.s)
+# a = b.s
+
+# print(a)
 
 
 # class funStaticClass():

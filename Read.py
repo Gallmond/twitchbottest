@@ -9,9 +9,10 @@ def getMessage(line):
 	elems = len(separate)
 	message = separate[elems-1]
 	return message
+
 def pingPong(line):
 	# handle ping/pong but ONLY from twitch
 	if line.find("PING") == 0:
-		s.send((line.replace("PING", "PONG")).encode(encoding='utf-8')) #pong back to twitch
+		botObject.sendMessage((line.replace("PING", "PONG"))) #pong back to twitch
 		print("responded to twitch ping")
 		return true
