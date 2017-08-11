@@ -1,0 +1,81 @@
+Chatbot loop pseudo
+
+=============================== main:
+- initialisations and includes
+- connect to socket/twitch
+- is bot already present? disconnect if so.
+- any api calls need making?
+- activate various features depending on settings
+- so long as everything successful:
+
+while running{
+	- read incoming from socket.
+
+	- does incoming need reacting to by bot infrastructure?
+	--ie. ping/pong, twitch sending RECONNECT commands
+
+	for f in listening_functions{
+
+		- any function do logic reactions to these messages
+		--should these functions ever break this loop?
+		--can they from within the function
+
+	}
+	
+}
+
+=============================== user class
+- array of users
+- info like: username, id, inroom, lastmessage, opstatus, currencyamt
+
+=============================== socket class:
+- function openSocket // opens connection
+- function closeSocket // closes
+- function sendToSocket // sends a line to socket, utilised by the below *throttled based on twitch limits *keep arr of most recently sent
+- function sendMessage // sends message to channel 
+- function sendWhisper // sends whisper to user
+- function setUserStatus // sets user status *throttled based on twitch limits
+
+=============================== read class:
+- function getUserList // returns entire REMEMBERED userlist, not necessarily live
+- function getUserDetails // returns details of single given username
+- function getUser // parses user from line
+- function getMessage // parses message from line
+
+=============================== spam controls:
+- kick for X messages in Y time
+- kick for X use of set word in Y time
+- Insta or strike system
+
+=============================== polls:
+- polls by mods vote on 1 of X options
+- 1 vote per user 
+
+=============================== currency:
+/* Notes:
+- Currency name in settings (ie, cakes or biscuits or something)
+- Earned by:
+	X per Z time spent in chat (last-message timer for AFK people?)
+	rewarded by mods
+	betting
+	lottery
+- Spent by:
+	Discards (ie, username shoved X currencyname into players's face)
+	Pay X amount for custom join message from the bot
+- Bets: 
+	a true/false to be confirmed by chat mod (ie, player achieves this run)
+	a time until-true to be triggered by chat (ie, player dies withint X, Y, or Z minutes)
+- Lottery:
+	pool of credits built from peoples contributions (allow multiple entries?)
+	randomly chosen by system
+- Leaderboards:
+	List top X currency-havers
+	List fastest X currency-earners
+	List fastest X currency-losers
+- Trivia:
+	X currency for first correct answer
+	If not instant end, rewards for other correct answerers 
+*/
+
+
+
