@@ -1,7 +1,8 @@
 Last thing I was doing:
 - fixed ping/ping. 
-- Now suss out how the listening functions will work
-- Then make the User listener make the list of active users
+- check join/leave formats
+-- the NAMES list on join needs to create the userlist IMMEDIATELY
+-- for some reason names list doesn't show the broadcaster user???
 
 Chatbot loop pseudo
 
@@ -84,3 +85,22 @@ while running{
 
 
 
+
+
+
+FORMAT NOTES:
+
+incoming whisper with tags like:
+> @badges=;color=;display-name=RubMyBum;emotes=;message-id=4;thread-id=142411464_166478382;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv WHISPER gavin_test_bot :this is a whisper
+
+incoming normal message with tags like:
+> @badges=broadcaster/1;color=;display-name=RubMyBum;emotes=;id=0f049fc9-05df-4d09-b570-c32f9b4447aa;mod=0;room-id=142411464;sent-ts=1502633648703;subscriber=0;tmi-sent-ts=1502633650176;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv PRIVMSG #rubmybum :This is a normal incoming message
+
+names list like:
+> :gavin_test_bot.tmi.twitch.tv 353 gavin_test_bot = #rubmybum :gavin_test_bot
+> :gavin_test_bot.tmi.twitch.tv 366 gavin_test_bot #rubmybum :End of /NAMES list
+
+twitch doc names list:
+> :<user>.tmi.twitch.tv 353 <user> = #<channel> :<user> <user2> <user3>
+> :<user>.tmi.twitch.tv 353 <user> = #<channel> :<user4> <user5> ... <userN>
+> :<user>.tmi.twitch.tv 366 <user> #<channel> :End of /NAMES list

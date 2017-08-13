@@ -1,62 +1,44 @@
-import time
-import uuid
-import sys
 
 
-s = "bbbbb\r\n"
+s = "False"
 
-print(s.find("\r"))
+if(s):
+	print(s)
+else:
+	print("osf")
 
-# s = "some string with newline \r\n"
-
-# print(len(s))
-# print(len(s)-len("\r\n"))
-# print(s.index("\r\n"))
-
-# id
-
-# if(1 != 2):
-# 	print(False)
+# s = ":jtv MODE #rubmybum +o rubmybum"
+# sa = s.split(" ")[len(s.split(" "))-2]
+# us = s.split(" ")[len(s.split(" "))-1]
+# print(sa)
+# print(us)
 
 
-# class testc():
-# 	def __init__(self):
-# 		self.s = "wpw"
-		
 
-# b = testc()
+# class staticClassA():
+# 	st = "I'm in static class a"
+# 	def changeStr():
+# 		staticClassA.st = "static str changed"
 
-# a = b.s
+# class classA():
+# 	st = "I'm in Class A"
 
-# print(a)
+# 	def changeStr(self):
+# 		self.st = "st changes"
 
+# referencedSt = staticClassA.st
 
-# class funStaticClass():
-
-# 	foo = "wee"
-
-# print(funStaticClass().foo)
-
-# print(uuid.uuid4()) 
-# print(uuid.uuid4().hex)
-
-# class parentClass:
-
-# 	s = "thisstring"
-
-# 	def foo(self):
-# 		print(self.s)
-# 		return True
-
-# class childClass(parentClass):
-
-# 	#s = "thatstring"
-
-# 	def foo(self):
-# 		self.s = self.s+"added!"
-# 		super(childClass, self).foo()
+# print(referencedSt+" (referencedSt) ")
+# print(staticClassA.st+" (staticClassA.st) ")
+# staticClassA.changeStr()
+# print(referencedSt+" (referencedSt post static changeStr) ")
+# print(staticClassA.st+" (staticClassA.st post static changeStr) ")
 
 
-# x = childClass()
-
-# print(x.foo())
+# first = classA()
+# second = first
+# print(first.st+" (first.st) ")
+# print(second.st+" (second.st) ")
+# second.changeStr()
+# print(first.st+" (first.st post instanced changeStr) ")
+# print(second.st+" (second.st post instanced changeStr) ")

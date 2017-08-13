@@ -1,5 +1,6 @@
 import socket
 from Settings import HOST, PORT, PASS, IDENT, CHANNEL
+from Users import Users
 # from Helpers import throttler
 
 class botSocket():
@@ -23,11 +24,18 @@ class botSocket():
 		print("listening for connection")
 		while Loading:
 			readbuffer = readbuffer + self.activeSocket.recv(1024).decode("utf-8")
-			temp = readbuffer.split("\n")
+			temp = readbuffer.split("\r\n")
 			readbuffer = temp.pop()
 			
 			for line in temp:
 				print("> "+str(line))
+
+				# build init userlist
+				if(line.split(":")[1].split(" ")[1] == "353"):
+					Users.buildUserList(line)
+				# build init userlist end
+
+
 				if("End of /NAMES list" in line):
 					Loading = False;
 					print("< PRIVMSG #" + CHANNEL + " : Bot joined chat")

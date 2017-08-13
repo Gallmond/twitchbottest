@@ -1,29 +1,29 @@
 import string
 import time
+import module_share
+
 from Read import getUser, getMessage, pingPong
 from Socket import botSocket, openSocket, sendMessage, requestTwitchPermissions
-from Initialize import joinRoom
+from Users import Users
 
 # listening functions should return true if they are to break 
 # the loop (this will skip following functions)
 listeningFunctions = [] 
 
-
-
 botObject = botSocket()
-
-s = botObject.getSocket()
-# joinRoom(s)
+module_share.botObject = botObject
 
 
-# prevent timeouts
-listeningFunctions.append(pingPong)
+
+listeningFunctions.append(pingPong) # prevent timeouts
+listeningFunctions.append(Users.UserListener) # listen for user based updates
 
 # request permissions
 botObject.requestPermissions()
 
+s = botObject.getSocket() # for the input stream
 readbuffer = ""
-startTime = time.time();
+startTime = time.time()
 while True:
 	readbuffer = readbuffer + s.recv(1024).decode("utf-8")
 	temp = readbuffer.split("\r\n")
@@ -40,7 +40,6 @@ while True:
 				break
 
 		message = getMessage(line)
-		print ()
 		if "You Suck" in message:
 			botObject.sendMessage("No, you suck!")
 			break
