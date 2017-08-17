@@ -1,3 +1,5 @@
 __pycache__/
 Settings.py
 *.sublime-*
+*DS_Store*
+*gavgit*
