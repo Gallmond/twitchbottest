@@ -1,11 +1,16 @@
 # mac machine change
 
-s = "False"
+p = "this is a string running from new machine";
+print(p);
+print("I should also check that the socket can connect from here!")
 
-if(s):
-	print(s)
-else:
-	print("osf")
+
+# s = "False"
+
+# if(s):
+# 	print(s)
+# else:
+# 	print("osf")
 
 # s = ":jtv MODE #rubmybum +o rubmybum"
 # sa = s.split(" ")[len(s.split(" "))-2]
