@@ -1,8 +1,7 @@
 Last thing I was doing:
-- fixed ping/ping. 
-- check join/leave formats
--- the NAMES list on join needs to create the userlist IMMEDIATELY
--- for some reason names list doesn't show the broadcaster user???
+- added whispering.
+- keep cleaning up listeners on users.
+- suss out a way for better logging debug. something to write all users to a file or whatever
 
 Chatbot loop pseudo
 

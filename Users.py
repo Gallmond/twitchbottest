@@ -1,10 +1,38 @@
-# =============================== user class
-# - array of users
-# - info like: username, id, inroom, lastmessage, opstatus, currencyamt
+import module_share
 import uuid
 import time
 
-from Settings import USER_STARTING_POINTS, CHANNEL
+from Read import getUser
+from Settings import USER_STARTING_POINTS, CHANNEL, POINTS_AK_ADD, POINTS_AK_PERIOD, POINTS_NAME_PLURAL
+
+class UserPoints():
+
+	lastPresenceCheck = time.time()
+
+	def add(userObj, add):
+		userObj.points+= add
+		return userObj.points
+
+	def subtract(userObj, subtract):
+		userObj.points-= subtract
+		return userObj.points
+
+	def presencePoints():
+		now = time.time()
+		pamnt = 0;
+		usernm = 0;
+		if UserPoints.lastPresenceCheck < now-POINTS_AK_PERIOD:
+
+			for li in Users.userList:
+				if li[1].afk is False:
+					li[1].points += POINTS_AK_ADD
+					usernm+=1
+					pamnt+= POINTS_AK_ADD
+			UserPoints.lastPresenceCheck = now
+
+		print("added "+str(pamnt)+" points to "+str(usernm)+" users")
+		# add X points to every user present in chat
+
 
 class Users(): # ALWAYS CALL STATICALLY 
 
@@ -25,6 +53,8 @@ class Users(): # ALWAYS CALL STATICALLY
 			else:
 				Users.newUser(_username)
 		print("Users.userList length ["+str(len(Users.userList))+"]")
+		for li in Users.userList:
+			print(li[1].username);
 
 
 
@@ -39,11 +69,35 @@ class Users(): # ALWAYS CALL STATICALLY
 		middle = _msg.split(":")[1]
 		if(len(_msg.split(":"))>2): # does it even have a last part?
 			last = _msg.split(":")[2]
+		else:
+			last = ""
 
-		if(middle.split(" ")[1] == "WHISPER"): # this is a whisper
-			return False
-		elif(middle.split(" ")[1] == "PRIVMSG"): # this is a normal message
-			return False
+		# ========= MESSAGES FROM CHAT
+		if isUserMessage(_msg):
+
+			if userMessageStarts(_msg, "!"+POINTS_NAME_PLURAL): # user typed "!points"
+				thisUser = middle.split("!")[0] 
+				thisUserObject = Users.getUserByUsername(thisUser)
+				thisUserPoints = thisUserObject.points
+				msg = thisUser+" has "+str(thisUserPoints)+" "+POINTS_NAME_PLURAL
+				module_share.botObject.sendMessage(msg)
+				return True
+
+		# ========= MESSAGES FROM CHAT END
+
+		# ========= DIRECT WHISPER
+		if isWhisper(_msg):
+
+			if userMessageStarts(_msg, "hiya"):
+				module_share.botObject.sendWhisper("back at ya", getUser(_msg))
+				return False
+
+
+		# ========= DIRECT WHISPER END
+
+
+
+		
 
 
 		# check for userlist building
@@ -68,18 +122,17 @@ class Users(): # ALWAYS CALL STATICALLY
 		if(middle.find("jtv MODE #"+CHANNEL)==0):
 			thisUser = middle.split(" ")[len(middle.split(" "))-1]
 			mode = middle.split(" ")[len(middle.split(" "))-2] # should be '-o' or '+o'
-
 			thisUserObject = Users.getUserByUsername(thisUser)
 			thisUserObject.opstatus = mode
-			return thisUserObject.opstatus
+			return True
 
 		# user left
 		# > :ronni!ronni@ronni.tmi.twitch.tv PART #dallas
 		if(middle.split(" ")[1] == "PART"):
-			thisUser = middle.split("!")[0].split(":")[1] 
+			thisUser = middle.split("!")[0] 
 			thisUserObject = Users.getUserByUsername(thisUser)
 			thisUserObject.inChannel = False
-			return thisUserObject
+			return True
 
 		return False
 
@@ -93,7 +146,6 @@ class Users(): # ALWAYS CALL STATICALLY
 
 	def getUserByUsername(_username):
 		for i in Users.userList:
-			print(i)
 			if i[1].username.lower() == _username.lower():
 				return i[1]
 		return False
@@ -104,6 +156,11 @@ class Users(): # ALWAYS CALL STATICALLY
 				return i[1]
 		return False
 
+	def getUserPoints(_id):
+		for i in Users.userList:
+			if i[0] == _id:
+				return i[1].points
+		return False
 
 class User():
 
@@ -116,3 +173,31 @@ class User():
 		self.opstatus = "unknown"
 		self.inChannel = True
 
+
+
+# helpers for checking what kind of incoming message
+def userMessageStarts(_msg, _keyword):
+	ma = _msg.split(":")
+	if ma[2].find(_keyword)==-1:
+		return False
+	else:
+		if ma[2].find(_keyword)==0:
+			return True
+		else:
+			return False
+
+def isWhisper(_msg):
+	ma = _msg.split(":")
+	if ma[1].split(" ")[1]=="WHISPER":
+		return True
+	else:
+		return False
+
+def isUserMessage(_msg):
+	# format like:
+	# > @badges=broadcaster/1;color=;display-name=RubMyBum;emotes=;id=b7b8bccd-ee77-4287-8868-3cf5b64f4cf4;mod=0;room-id=142411464;sent-ts=1502990928960;subscriber=0;tmi-sent-ts=1502990929450;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv PRIVMSG #rubmybum :11456
+	ma = _msg.split(":")
+	if ma[1].split(" ")[1] == "PRIVMSG":
+		return True
+	else:
+		return False

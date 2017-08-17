@@ -4,11 +4,11 @@ import module_share
 
 from Read import getUser, getMessage, pingPong
 from Socket import botSocket, openSocket, sendMessage, requestTwitchPermissions
-from Users import Users
+from Users import Users, UserPoints
 
-# listening functions should return true if they are to break 
-# the loop (this will skip following functions)
-listeningFunctions = [] 
+# listening functions should return true if they are to break the loop
+listeningFunctions = [] # this reacts to incoming lines
+backgroundFunctions = [] # this just does stuff on timers
 
 botObject = botSocket()
 module_share.botObject = botObject
@@ -17,6 +17,8 @@ module_share.botObject = botObject
 
 listeningFunctions.append(pingPong) # prevent timeouts
 listeningFunctions.append(Users.UserListener) # listen for user based updates
+
+backgroundFunctions.append(UserPoints.presencePoints) # this adds points for people in the chat
 
 # request permissions
 botObject.requestPermissions()
@@ -42,4 +44,8 @@ while True:
 		message = getMessage(line)
 		if "You Suck" in message:
 			botObject.sendMessage("No, you suck!")
+			break
+
+	for f in backgroundFunctions:
+		if f():
 			break

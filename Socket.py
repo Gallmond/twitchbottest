@@ -61,6 +61,14 @@ class botSocket():
 		self.send(messageTemp)
 		return True
 
+	def sendWhisper(self, _msg, _username): # send whisper
+		messageTemp = "PRIVMSG #" + CHANNEL + " :/w "+_username+" "+_msg
+		self.send(messageTemp)
+		print("Whispered: " + messageTemp)
+
+
+		return True
+
 	def send(self, _msg): # print then send directly to socket
 		print("< "+str(_msg))
 
