@@ -3,31 +3,23 @@ Last thing I was doing:
 - keep cleaning up listeners on users.
 - suss out a way for better logging debug. something to write all users to a file or whatever
 
-Chatbot loop pseudo
 
-=============================== main:
-- initialisations and includes
-- connect to socket/twitch
-- is bot already present? disconnect if so.
-- any api calls need making?
-- activate various features depending on settings
-- so long as everything successful:
+v1:
+Consistent userlist tracking points and message activity
+a command to spend/give points
+admin controls
+spam controls
+polls 
 
-while running{
-	- read incoming from socket.
 
-	- does incoming need reacting to by bot infrastructure?
-	--ie. ping/pong, twitch sending RECONNECT commands
+v2:
+Can it be made to work across multiple channels simultaniously?
+Bets
+Lottery
+Leaderboards
 
-	for f in listening_functions{
+v3:
 
-		- any function do logic reactions to these messages
-		--should these functions ever break this loop?
-		--can they from within the function
-
-	}
-	
-}
 
 =============================== user class
 - array of users
