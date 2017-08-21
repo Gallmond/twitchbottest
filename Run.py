@@ -3,22 +3,24 @@ import time
 import module_share
 
 from Read import getUser, getMessage, pingPong
-from Socket import botSocket, openSocket, sendMessage, requestTwitchPermissions
+from Socket import botSocket
 from Users import Users, UserPoints
 
 # listening functions should return true if they are to break the loop
 listeningFunctions = [] # this reacts to incoming lines
 backgroundFunctions = [] # this just does stuff on timers
 
+# init users
+Users.customInit()
+
 botObject = botSocket()
 module_share.botObject = botObject
-
-
 
 listeningFunctions.append(pingPong) # prevent timeouts
 listeningFunctions.append(Users.UserListener) # listen for user based updates
 
 backgroundFunctions.append(UserPoints.presencePoints) # this adds points for people in the chat
+backgroundFunctions.append(Users.saveUserFile) # this adds points for people in the chat
 
 # request permissions
 botObject.requestPermissions()
@@ -26,7 +28,17 @@ botObject.requestPermissions()
 s = botObject.getSocket() # for the input stream
 readbuffer = ""
 startTime = time.time()
+theString = ""
 while True:
+	print("0")
+
+	for f in backgroundFunctions:
+		print("2")
+		f()
+			
+
+	print("0.1")
+
 	readbuffer = readbuffer + s.recv(1024).decode("utf-8")
 	temp = readbuffer.split("\r\n")
 	readbuffer = temp.pop()		
@@ -37,15 +49,14 @@ while True:
 
 		# do listening to incoming	
 		for f in listeningFunctions:			
+			print("1")
 			if f(line):			
 				print("breaking loop")			
 				break
 
-		message = getMessage(line)
-		if "You Suck" in message:
-			botObject.sendMessage("No, you suck!")
-			break
+	
 
-	for f in backgroundFunctions:
-		if f():
-			break
+# example of rubmybum message:
+#  @badges=broadcaster/1;color=;display-name=RubMyBum;emotes=;id=b281e6b1-902f-47ba-8cf4-809e9e045b2f;mod=0;room-id=142411464;sent-ts=1503340083874;subscriber=0;tmi-sent-ts=1503340085138;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv PRIVMSG #rubmybum :fun gavin test
+# user id is : user-id=142411464
+# room id is : room-id=142411464

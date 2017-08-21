@@ -1,3 +1,19 @@
-s = "@badges=broadcaster/1;color=;display-name=RubMyBum;emotes=;id=b7b8bccd-ee77-4287-8868-3cf5b64f4cf4;mod=0;room-id=142411464;sent-ts=1502990928960;subscriber=0;tmi-sent-ts=1502990929450;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv PRIVMSG #rubmybum :11456"
-sa = s.split(":")
-print(sa[1].split(" "))
+import pickle
+import os
+
+with open('filestore/userlist.pkl', 'rb') as f:
+	UL = pickle.load(f)
+
+
+for key_username in UL:
+	thisU = UL[key_username] 
+	print("=========="+key_username+"==========")
+	print("twitchid: "+str(thisU.twitchid))
+	print("username: "+str(thisU.username))
+	print("timeJoined: "+str(thisU.timeJoined))
+	print("points: "+str(thisU.points))
+	print("messages: ")
+	for m in thisU.messages:
+		print(m)
+	print("opstatus: "+str(thisU.opstatus))
+	print("inChannel: "+str(thisU.inChannel))

@@ -1,9 +1,10 @@
 import module_share
 import uuid
 import time
+import pickle
 
 from Read import getUser
-from Settings import USER_STARTING_POINTS, CHANNEL, POINTS_AK_ADD, POINTS_AK_PERIOD, POINTS_NAME_PLURAL
+from Settings import USER_STARTING_POINTS, CHANNEL, POINTS_AK_ADD, POINTS_AK_PERIOD, POINTS_NAME_PLURAL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
 
 class UserPoints():
 
@@ -23,48 +24,57 @@ class UserPoints():
 		usernm = 0;
 		if UserPoints.lastPresenceCheck < now-POINTS_AK_PERIOD:
 
-			for li in Users.userList:
-				if li[1].afk is False:
-					li[1].points += POINTS_AK_ADD
+			for userName in Users.userList:
+				if isUserAfk(userName) is False:
+					Users.userList[userName].points += POINTS_AK_ADD
 					usernm+=1
 					pamnt+= POINTS_AK_ADD
 			UserPoints.lastPresenceCheck = now
 
-		print("added "+str(pamnt)+" points to "+str(usernm)+" users")
-		# add X points to every user present in chat
+			print("added "+str(pamnt)+" points to "+str(usernm)+" users")
+			# add X points to every user present in chat
 
 
 class Users(): # ALWAYS CALL STATICALLY 
 
-	userList = []
+	userListLoadedTime = time.time()
+	userListSavedTime = time.time()
+	userList = {}
 
-	def buildUserList(_msg): # from the initial join NAMES list
+	def saveUserFile():
+		if Users.userListSavedTime < time.time()-FILE_SAVE_PERIOD:
+			saveUserListToFile(Users.userList)
+			Users.userListSavedTime = time.time()
+			print("saved userlist to file")
+		return True
+
+	def customInit():
+		# load userlist
+		Users.userList = loadUserListFromFile()
+		Users.userListLoadedTime = time.time()
+		print("loaded userList "+str(len(Users.userList)))
+
+	def buildUserList(_msg):
+
 		# split names in this message
 		ma = _msg.split(":")
-		nl = ma[2].split(" ")
+		nameList = ma[2].split(" ")
 		# force broadcaster name into list
-		nl.append(CHANNEL)
-		for username in nl:
-			_username = username.replace("\r\n","")
-			# does this user already exist? if so mark as inchannel
-			thisUserObject = Users.getUserByUsername(_username)
-			if(thisUserObject):
-				thisUserObject.inChannel = True
+		nameList.append(CHANNEL)
+		for userName in nameList:
+			userName = userName.replace("\r\n","")
+
+			# does this exist?
+			if userName in Users.userList:
+				# just mark as present
+				Users.userList[userName].inChannel = True
 			else:
-				Users.newUser(_username)
-		print("Users.userList length ["+str(len(Users.userList))+"]")
-		for li in Users.userList:
-			print(li[1].username);
-
-
+				# add new user
+				Users.addNewUser(userName)
+		print("userlist length: "+str(len(Users.userList)))
 
 	def UserListener(_msg):
 
-		# discard if privmsg or whisper
-		# whisper format:
-		# > @badges=;color=;display-name=RubMyBum;emotes=;message-id=4;thread-id=142411464_166478382;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv WHISPER gavin_test_bot :this is a whisper
-		# message format:
-		# > @badges=broadcaster/1;color=;display-name=RubMyBum;emotes=;id=0f049fc9-05df-4d09-b570-c32f9b4447aa;mod=0;room-id=142411464;sent-ts=1502633648703;subscriber=0;tmi-sent-ts=1502633650176;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv PRIVMSG #rubmybum :This is a normal incoming message
 		front = _msg.split(":")[0]
 		middle = _msg.split(":")[1]
 		if(len(_msg.split(":"))>2): # does it even have a last part?
@@ -72,17 +82,27 @@ class Users(): # ALWAYS CALL STATICALLY
 		else:
 			last = ""
 
+
+		# ========= USER STATE CHANGE
+		if isUserState(_msg):
+			return True
+
+		# ========= USER STATE CHANGE END
+
+
+
 		# ========= MESSAGES FROM CHAT
 		if isUserMessage(_msg):
 
+			logMessage(_msg)
+
 			if userMessageStarts(_msg, "!"+POINTS_NAME_PLURAL): # user typed "!points"
 				thisUser = middle.split("!")[0] 
-				thisUserObject = Users.getUserByUsername(thisUser)
+				thisUserObject = Users.userList[thisUser]
 				thisUserPoints = thisUserObject.points
 				msg = thisUser+" has "+str(thisUserPoints)+" "+POINTS_NAME_PLURAL
 				module_share.botObject.sendMessage(msg)
-				return True
-
+			return True
 		# ========= MESSAGES FROM CHAT END
 
 		# ========= DIRECT WHISPER
@@ -90,9 +110,7 @@ class Users(): # ALWAYS CALL STATICALLY
 
 			if userMessageStarts(_msg, "hiya"):
 				module_share.botObject.sendWhisper("back at ya", getUser(_msg))
-				return False
-
-
+			return False
 		# ========= DIRECT WHISPER END
 
 
@@ -122,7 +140,7 @@ class Users(): # ALWAYS CALL STATICALLY
 		if(middle.find("jtv MODE #"+CHANNEL)==0):
 			thisUser = middle.split(" ")[len(middle.split(" "))-1]
 			mode = middle.split(" ")[len(middle.split(" "))-2] # should be '-o' or '+o'
-			thisUserObject = Users.getUserByUsername(thisUser)
+			thisUserObject = Users.userList[thisUser]
 			thisUserObject.opstatus = mode
 			return True
 
@@ -130,46 +148,28 @@ class Users(): # ALWAYS CALL STATICALLY
 		# > :ronni!ronni@ronni.tmi.twitch.tv PART #dallas
 		if(middle.split(" ")[1] == "PART"):
 			thisUser = middle.split("!")[0] 
-			thisUserObject = Users.getUserByUsername(thisUser)
+			thisUserObject = Users.userList[thisUser]
 			thisUserObject.inChannel = False
 			return True
 
 		return False
 
-	def newUser(_username):
+	def addNewUser(_userName):
 		now = time.time()
-		newID = uuid.uuid4().hex
-		thisUser = User(_username, now)
-		Users.userList.append([newID, thisUser])
-		print("new user created ["+thisUser.username+"]")
-		return newID
+		thisUser = User(_userName, now)
+		Users.userList[_userName] = thisUser
+		print("created new user "+thisUser.username)
+		return _userName
 
-	def getUserByUsername(_username):
-		for i in Users.userList:
-			if i[1].username.lower() == _username.lower():
-				return i[1]
-		return False
-
-	def getUserById(_id):
-		for i in Users.userList:
-			if i[0] == _id:
-				return i[1]
-		return False
-
-	def getUserPoints(_id):
-		for i in Users.userList:
-			if i[0] == _id:
-				return i[1].points
-		return False
 
 class User():
 
 	def __init__(self, username, timeJoined):
+		self.twitchid = "unknown"
 		self.username = username
 		self.timeJoined = timeJoined
 		self.points = USER_STARTING_POINTS
 		self.messages = [] # [[timestamp, "messagetext"],[timestamp, "messagetext"], ...]
-		self.afk = False
 		self.opstatus = "unknown"
 		self.inChannel = True
 
@@ -186,6 +186,13 @@ def userMessageStarts(_msg, _keyword):
 		else:
 			return False
 
+def isUserState(_msg):
+	ma = _msg.split(":")
+	if ma[1].split(" ")[1]=="USERSTATE":
+		return True
+	else:
+		return False
+
 def isWhisper(_msg):
 	ma = _msg.split(":")
 	if ma[1].split(" ")[1]=="WHISPER":
@@ -194,10 +201,49 @@ def isWhisper(_msg):
 		return False
 
 def isUserMessage(_msg):
-	# format like:
-	# > @badges=broadcaster/1;color=;display-name=RubMyBum;emotes=;id=b7b8bccd-ee77-4287-8868-3cf5b64f4cf4;mod=0;room-id=142411464;sent-ts=1502990928960;subscriber=0;tmi-sent-ts=1502990929450;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv PRIVMSG #rubmybum :11456
 	ma = _msg.split(":")
 	if ma[1].split(" ")[1] == "PRIVMSG":
 		return True
 	else:
 		return False
+
+def loadUserListFromFile():
+	print("loadUserListFromFile")
+	with open('filestore/userlist.pkl', 'r+b') as f:
+		if f.seek(0,2) == 0:
+			return {}
+		else:
+			f.seek(0)
+			return pickle.load(f)
+
+def saveUserListToFile(_userListArr):
+	print("saveUserListToFile")
+	with open('filestore/userlist.pkl', 'wb') as f:
+		pickle.dump(_userListArr, f, pickle.HIGHEST_PROTOCOL)
+		print("saveUserListToFile END")
+		return True
+
+def isUserAfk(_userName):
+	if _userName in Users.userList:
+		if len(Users.userList[_userName].messages)==0:
+			return True
+		elif Users.userList[_userName].messages[0][0] > time.time()-USER_AFK_TIMER:
+			return False
+	else:
+		True
+
+def logMessage(_msg):
+	front = _msg.split(":")[0]
+	middle = _msg.split(":")[1]
+	if(len(_msg.split(":"))>2): # does it even have a last part?
+		last = _msg.split(":")[2]
+	else:
+		last = ""
+	# log this users message
+	thisUser = middle.split("!")[0] 
+	Users.userList[thisUser].messages.insert(0,[time.time(), _msg])
+	if len(Users.userList[thisUser].messages) > USER_MESSAGES_STORED:
+		Users.userList[thisUser].messages.pop()
+
+	# for testing
+	#saveUserListToFile(Users.userList)

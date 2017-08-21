@@ -1,8 +1,6 @@
 Last thing I was doing:
-- added whispering.
-- keep cleaning up listeners on users.
-- suss out a way for better logging debug. something to write all users to a file or whatever
-
+- added userfile write/read
+- s.recv waits until the given amount of bytes is recieved, this holding the while loop. https://stackoverflow.com/questions/30404838/python-2-7-while-loop-cant-break-out
 
 v1:
 Consistent userlist tracking points and message activity

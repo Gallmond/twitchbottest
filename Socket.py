@@ -43,7 +43,6 @@ class botSocket():
 		# while connecting end
 		print("connected")
 
-		#self.requestPermissions()
 		print("botSocket init end")
 		self.activeSocket.send(("PRIVMSG #" + CHANNEL + " : Bot joined chat\r\n").encode(encoding='utf-8'))
 
@@ -78,53 +77,3 @@ class botSocket():
 
 		self.activeSocket.send((_msg+"\r\n").encode(encoding='utf-8'))
 		return True
-
-
-# OLD BELOW =====================================================================
-# OLD BELOW =====================================================================
-# OLD BELOW =====================================================================
-# OLD BELOW =====================================================================
-# OLD BELOW =====================================================================
-# OLD BELOW =====================================================================
-# OLD BELOW =====================================================================
-# OLD BELOW =====================================================================
-# OLD BELOW =====================================================================
-# OLD BELOW =====================================================================
-# OLD BELOW =====================================================================
-# OLD BELOW =====================================================================
-
-
-def openSocket():
-	s = socket.socket()
-	s.connect((HOST, PORT))
-	s.send(("PASS " + PASS + "\r\n").encode(encoding='utf-8'))
-	s.send(("NICK " + IDENT + "\r\n").encode(encoding='utf-8'))
-	s.send(("JOIN #" + CHANNEL + "\r\n").encode(encoding='utf-8'))
-
-	# request commands (needed to whispter)
-	# s.send(("CAP REQ :twitch.tv/commands\r\n").encode(encoding='utf-8'))
-
-	# temp whisper test
-	
-	#s.send(("PRIVMSG #rub_my_bum :/w rubmybum tetttt\r\n").encode(encoding='utf-8'))
-	return s
-	
-def sendMessage(s, message):
-	messageTemp = "PRIVMSG #" + CHANNEL + " :" + message
-	s.send((messageTemp + "\r\n").encode(encoding='utf-8'))
-	print("< " + str(messageTemp))
-
-# 	Sending whisper format:
-# 	PRIVMSG #jtv :/w otherusername HeyGuys
-# 	Receiving whisper format:
-#	:rubmybum!rubmybum@rubmybum.tmi.twitch.tv WHISPER gavin_test_bot :fafafafa
-def sendWhisper(s, username, message):
-	msg = "PRIVMSG #" + CHANNEL + " :/w "+username+" "+message
-	s.send((msg + "\r\n").encode(encoding='utf-8'))
-	print("Whispered: " + messageTemp)
-
-def requestTwitchPermissions(s, permissionType):
-	permissions = ["commands","membership","tags"]
-	if permissionType not in permissions:
-		return False
-	s.send(("CAP REQ :twitch.tv/"+permissionType+"\r\n").encode(encoding='utf-8'))
