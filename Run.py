@@ -1,6 +1,7 @@
 import string
 import time
 import module_share
+import socket
 
 from Read import getUser, getMessage, pingPong
 from Socket import botSocket
@@ -30,18 +31,21 @@ readbuffer = ""
 startTime = time.time()
 theString = ""
 while True:
-	print("0")
 
 	for f in backgroundFunctions:
-		print("2")
 		f()
 			
+	s.setblocking(0)
+	s.settimeout(0.33)
+	try:
+		print("recv", end="")
+		readbuffer = readbuffer + s.recv(1024).decode("utf-8")			
+	except socket.timeout:
+		print(".")
 
-	print("0.1")
-
-	readbuffer = readbuffer + s.recv(1024).decode("utf-8")
 	temp = readbuffer.split("\r\n")
-	readbuffer = temp.pop()		
+	readbuffer = temp.pop()	
+	
 
 	for line in temp:
 		message = ""
@@ -49,7 +53,6 @@ while True:
 
 		# do listening to incoming	
 		for f in listeningFunctions:			
-			print("1")
 			if f(line):			
 				print("breaking loop")			
 				break

@@ -1,6 +1,6 @@
 Last thing I was doing:
-- added userfile write/read
-- s.recv waits until the given amount of bytes is recieved, this holding the while loop. https://stackoverflow.com/questions/30404838/python-2-7-while-loop-cant-break-out
+- added point gifting
+- I should move all the strings/nounds to the settings page for point gifting
 
 v1:
 Consistent userlist tracking points and message activity

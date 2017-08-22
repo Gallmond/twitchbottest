@@ -14,6 +14,6 @@ def getMessage(line):
 def pingPong(line):
 	# handle ping/pong but ONLY from twitch
 	if line.find("PING") == 0:
-		module_share.botObject.sendMessage((line.replace("PING", "PONG"))) #pong back to twitch
+		module_share.botObject.send((line.replace("PING", "PONG"))) #pong back to twitch
 		print("responded to twitch ping")
 		return True
