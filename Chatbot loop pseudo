@@ -1,6 +1,6 @@
 Last thing I was doing:
-- added point gifting
-- I should move all the strings/nounds to the settings page for point gifting
+- started on admin controls for points
+- need to suss out how to manage pending responses for admin commands (ie, when the bot asks are you sure you want to do Y?)
 - admin controls to add give/take points. Make polls
 
 v1:
@@ -93,3 +93,8 @@ twitch doc names list:
 > :<user>.tmi.twitch.tv 353 <user> = #<channel> :<user> <user2> <user3>
 > :<user>.tmi.twitch.tv 353 <user> = #<channel> :<user4> <user5> ... <userN>
 > :<user>.tmi.twitch.tv 366 <user> #<channel> :End of /NAMES list
+
+character limits:
+modded: 500 chars
+unmodded: 50 chars
+whispers: 500 chars

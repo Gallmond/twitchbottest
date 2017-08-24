@@ -4,8 +4,8 @@ import time
 import pickle
 
 from Read import getUser
-from Settings import IDENT, USER_STARTING_POINTS, CHANNEL, POINTS_AK_ADD, POINTS_AK_PERIOD, POINTS_NAME_PLURAL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
-
+from Settings import IDENT, USER_STARTING_POINTS, CHANNEL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
+from Settings_points import POINTS_AK_ADD, POINTS_AK_PERIOD, POINTS_NAME_PLURAL, POINTS_NAME, POINTS_BAD_FORMAT, POINTS_GIFT_SELF, POINTS_NOT_ENOUGH, POINTS_CONFIRM, POINTS_BOT_RESPONSE
 class UserPoints():
 
 	lastPresenceCheck = time.time()
@@ -90,42 +90,112 @@ class Users(): # ALWAYS CALL STATICALLY
 		# ========= USER STATE CHANGE END
 
 
+		# ========= WHISPERS FROM MODS
+		if isWhisper(_msg):
+			thisUser = middle.split("!")[0]
+			if Users.userList[thisUser].opstatus == "+o":
+				# ADMIN LISTENING HERE
+				
 
-		# ========= MESSAGES FROM CHAT
-		if isUserMessage(_msg):
+				# !points username to list specific users points
+				if userMessageStarts(_msg, "!points "):
+					#check format
+					userMsgArr = last.split(" ")
+					if len(userMsgArr)!=2:
+						return True # invalid foramt
+					if userMsgArr[1] not in Users.userList:
+						return True # user not exist
+					else:
+						thisUserPoints = Users.userList[userMsgArr[1]].points
+						module_share.botObject.sendWhisper(userMsgArr[1]+" has "+str(thisUserPoints)+" points", thisUser)
+				# !points username end
+
+
+				# !allPoints to list every users points
+				if userMessageStarts(_msg, "!allpoints"):
+					outputStr = "|"
+					for key in Users.userList:
+						outputStr+= str(key)+": "+str(Users.userList[key].points)
+
+					# is string too big?
+
+					charMax = 450
+					stringArr = [outputStr[i:i+charMax] for i in range(0, len(outputStr), charMax)]
+					for element in stringArr:
+						module_share.botObject.sendWhisper(element, thisUser)
+					return True;
+				# !allpoints end
+
+				# !setpoints username number
+				# !setpoints end
+
+
+
+				# ADMIN LISTENING END
+
+
+
+		# ========= WHISPERS FROM MODS END
+
+
+
+		# ========= MESSAGES FROM CHAT USERS
+		if isUserMessage(_msg) or isWhisper(_msg):
+
+			#sendWhisper(self, _msg, _username)
+			isWhisperType = isWhisper(_msg)
+			thisUser = middle.split("!")[0]
 
 			logMessage(_msg)
 
-			if userMessageStarts(_msg, "!"+POINTS_NAME_PLURAL): # user typed "!points"
+			# user typed "!points"
+			if userMessageStarts(_msg, "!"+POINTS_NAME_PLURAL): 
 
-				thisUser = middle.split("!")[0] 
 				thisUserObject = Users.userList[thisUser]
 				thisUserPoints = thisUserObject.points
 				msg = thisUser+" has "+str(thisUserPoints)+" "+POINTS_NAME_PLURAL
-				module_share.botObject.sendMessage(msg)
-				return True
+				if isWhisperType:
+					module_share.botObject.sendWhisper(msg, thisUser)
+				else:
+					module_share.botObject.sendMessage(msg)
 
-			if userMessageStarts(_msg, "!give"): # user typed !give username X eccies
+				return True
+			
+			# user typed !give username X eccies
+			if userMessageStarts(_msg, "!give"): 
 				tempmsg = _msg.replace("\r\n","")
-				if tempmsg.find(POINTS_NAME_PLURAL) == len(tempmsg)-len(POINTS_NAME_PLURAL): # message ends with the plural name
-					thisUser = middle.split("!")[0].lower() 
+				if tempmsg.find(POINTS_NAME_PLURAL) == len(tempmsg)-len(POINTS_NAME_PLURAL) or tempmsg.find("1 "+POINTS_NAME) == len(tempmsg)-len("1 "+POINTS_NAME): # message ends with the plural name
 					thisUserObject = Users.userList[thisUser]
 					thisUserPoints = thisUserObject.points
 					thisUserGiving = last.split(" ")
 					if len(thisUserGiving)!=4:
-						module_share.botObject.sendMessage("bad format give request")
+						if isWhisperType:
+							module_share.botObject.sendWhisper(POINTS_BAD_FORMAT, thisUser)
+						else:
+							module_share.botObject.sendMessage(POINTS_BAD_FORMAT)
+
 						return True
 					else:
 						targetUser = thisUserGiving[1].lower()
 
 					#can't give to self, bot can though
 					if targetUser == thisUser:
-						module_share.botObject.sendMessage("can't give points to yourself")
+						if isWhisperType:
+							module_share.botObject.sendWhisper(POINTS_GIFT_SELF, thisUser)
+						else:
+							module_share.botObject.sendMessage(POINTS_GIFT_SELF)
+
 						return True
 
 					#does user even have this many points?
 					if int(thisUserPoints) < int(thisUserGiving[2]):
-						module_share.botObject.sendMessage("Not enough "+POINTS_NAME_PLURAL+" only "+str(thisUserPoints)+" left")
+						msgToSend = POINTS_NOT_ENOUGH
+						msgToSend = msgToSend.replace("{pointamount}", str(thisUserPoints))
+						if isWhisperType:
+							module_share.botObject.sendWhisper(msgToSend, thisUser)
+						else:
+							module_share.botObject.sendMessage(msgToSend)
+
 						return True
 					else:
 						pointsToGive = int(thisUserGiving[2])
@@ -134,34 +204,27 @@ class Users(): # ALWAYS CALL STATICALLY
 					if targetUser in Users.userList:
 						Users.userList[targetUser].points += pointsToGive;
 						Users.userList[thisUser].points -= pointsToGive;
-						s = "user "+str(thisUser)+" gave user "+str(targetUser)+" "+str(pointsToGive)+" of their points"
+						msgToSend = POINTS_CONFIRM.replace("{giver}", str(thisUser))
+						msgToSend = msgToSend.replace("{target}", str(targetUser))
+						msgToSend = msgToSend.replace("{amountgiven}", str(pointsToGive))
+
 						# if gifting to the bot
 						if targetUser == IDENT.lower():
-							s+=". ta babes"
-						print(s)
-						module_share.botObject.sendMessage(s)
-
+							msgToSend+=POINTS_BOT_RESPONSE
+						print(msgToSend)
+						if isWhisperType:
+							module_share.botObject.sendWhisper(msgToSend, thisUser)
+						else:
+							module_share.botObject.sendMessage(msgToSend)
 					else:
-						module_share.botObject.sendMessage(targetUser+" doesn't exist!")
-
-
-
-
-
-
-
+						if isWhisperType:
+							module_share.botObject.sendWhisper(targetUser+" doesn't exist", thisUser)
+						else:
+							module_share.botObject.sendMessage(targetUser+" doesn't exist")
 
 
 
 		# ========= MESSAGES FROM CHAT END
-
-		# ========= DIRECT WHISPER
-		if isWhisper(_msg):
-
-			if userMessageStarts(_msg, "hiya"):
-				module_share.botObject.sendWhisper("back at ya", getUser(_msg))
-			return False
-		# ========= DIRECT WHISPER END
 
 
 
