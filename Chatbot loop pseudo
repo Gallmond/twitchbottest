@@ -6,10 +6,9 @@ Last thing I was doing:
 v1:
 Consistent userlist tracking points and message activity
 a command to spend/give points
-admin controls
-spam controls
+admin controls (give/take points from specific users)
 polls 
-
+!game command with timer
 
 v2:
 Can it be made to work across multiple channels simultaniously?
