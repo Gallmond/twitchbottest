@@ -2,6 +2,8 @@ import module_share
 import uuid
 import time
 import pickle
+import string
+import random
 
 from Read import getUser
 from Settings import IDENT, USER_STARTING_POINTS, CHANNEL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
@@ -56,7 +58,7 @@ class Users(): # ALWAYS CALL STATICALLY
 	def buildUserList(_msg):
 
 		# split names in this message
-		ma = _msg.split(":")
+		ma = _msg.split(":", 2)
 		nameList = ma[2].split(" ")
 		# force broadcaster name into list
 		nameList.append(CHANNEL)
@@ -74,10 +76,10 @@ class Users(): # ALWAYS CALL STATICALLY
 
 	def UserListener(_msg):
 
-		front = _msg.split(":")[0]
-		middle = _msg.split(":")[1]
-		if(len(_msg.split(":"))>2): # does it even have a last part?
-			last = _msg.split(":")[2]
+		front = _msg.split(":", 2)[0]
+		middle = _msg.split(":", 2)[1]
+		if(len(_msg.split(":", 2))>2): # does it even have a last part?
+			last = _msg.split(":", 2)[2]
 		else:
 			last = ""
 
@@ -95,7 +97,31 @@ class Users(): # ALWAYS CALL STATICALLY
 			thisUser = middle.split("!")[0]
 			if Users.userList[thisUser].opstatus == "+o":
 				# ADMIN LISTENING HERE
-				
+
+
+				# check for confirmations of pending commands
+				if userMessageStarts(_msg, "!confirm "):
+					thisConfCode = last.split(" ")[1]
+					if thisUser in module_share.pending_commands:
+						for command in module_share.pending_commands[thisUser]:
+							if command["confcode"] == thisConfCode:
+
+								# VVVVV MANAGE PENDING ADMIN COMMANDS HERE VVVVV!
+								if command["type"] == "points":
+									newPoints = command["params"]["amnt"]
+									target = command["params"]["target"]
+									Users.userList[target].points = int(newPoints)
+
+									module_share.botObject.sendWhisper("set "+target+"'s points to "+str(newPoints), thisUser)
+									module_share.pending_commands[thisUser].pop(module_share.pending_commands[thisUser].index(command))
+
+									return True
+								# ^^^^^ MANAGE PENDING ADMIN COMMANDS HERE ^^^^^!
+
+
+
+				# check for confirmations of pending commands END
+
 
 				# !points username to list specific users points
 				if userMessageStarts(_msg, "!points "):
@@ -127,6 +153,28 @@ class Users(): # ALWAYS CALL STATICALLY
 				# !allpoints end
 
 				# !setpoints username number
+				if userMessageStarts(_msg, "!setpoints"):
+					if len(last.split(" ")) != 3:
+						module_share.botObject.sendWhisper("Bad format", thisUser)
+						return True
+
+					target = last.split(" ")[1]
+					if target.lower() not in Users.userList:
+						module_share.botObject.sendWhisper("User "+target+" doesn't exist", thisUser)
+						return True
+					pointAmnt = int(last.split(" ")[2])
+
+					targetCurrentPoints = Users.userList[target.lower()].points
+
+					# set pending command
+					thisCommand = addPendingCommand(thisUser, "points", {"amnt": pointAmnt, "target": target})
+
+					confString = "reply \"!confirm "+thisCommand["confcode"]+"\" to set "+target+"'s points to "+str(pointAmnt)+"? current amount is "+str(targetCurrentPoints)
+					# "set user's points to X? Current amount is Y"
+
+					module_share.botObject.sendWhisper(confString, thisUser)
+
+					return True
 				# !setpoints end
 
 
@@ -292,7 +340,7 @@ class User():
 
 # helpers for checking what kind of incoming message
 def userMessageStarts(_msg, _keyword):
-	ma = _msg.split(":")
+	ma = _msg.split(":", 2)
 	print(ma[2])
 
 	print(_keyword)
@@ -306,21 +354,21 @@ def userMessageStarts(_msg, _keyword):
 			return False
 
 def isUserState(_msg):
-	ma = _msg.split(":")
+	ma = _msg.split(":", 2)
 	if ma[1].split(" ")[1]=="USERSTATE":
 		return True
 	else:
 		return False
 
 def isWhisper(_msg):
-	ma = _msg.split(":")
+	ma = _msg.split(":", 2)
 	if ma[1].split(" ")[1]=="WHISPER":
 		return True
 	else:
 		return False
 
 def isUserMessage(_msg):
-	ma = _msg.split(":")
+	ma = _msg.split(":", 2)
 	if ma[1].split(" ")[1] == "PRIVMSG":
 		return True
 	else:
@@ -352,10 +400,10 @@ def isUserAfk(_userName):
 		True
 
 def logMessage(_msg):
-	front = _msg.split(":")[0]
-	middle = _msg.split(":")[1]
-	if(len(_msg.split(":"))>2): # does it even have a last part?
-		last = _msg.split(":")[2]
+	front = _msg.split(":", 2)[0]
+	middle = _msg.split(":", 2)[1]
+	if(len(_msg.split(":", 2))>2): # does it even have a last part?
+		last = _msg.split(":", 2)[2]
 	else:
 		last = ""
 	# log this users message
@@ -368,7 +416,7 @@ def logMessage(_msg):
 	#saveUserListToFile(Users.userList)
 
 def parseUserStateChange(_msg):
-	states = _msg.split(":")[0] # this contains all states
+	states = _msg.split(":", 2)[0] # this contains all states
 	if states.find("@")==0:
 		states = states[1:] # snip the @ off the front
 	states = states.split(";")
@@ -392,4 +440,18 @@ def parseUserStateChange(_msg):
 			Users.userList[thisUserName].usertype = tempDict["userType"]
 	return True
 
+def addPendingCommand(userName, commandType, paramDict):
 
+	# does user have an arr on it yet?
+	if userName not in module_share.pending_commands:
+		module_share.pending_commands[userName] = []
+
+	# conf code: 
+	N = 6
+	confCode = ''.join(random.choices(string.ascii_uppercase, k=N))
+
+	# add command
+	now = time.time()
+	thisCommand = {"confcode":confCode, "type":commandType, "time": now, "params": paramDict}
+	module_share.pending_commands[userName].append(thisCommand)
+	return thisCommand

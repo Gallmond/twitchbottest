@@ -1,7 +1,8 @@
 Last thing I was doing:
+- just finished the "!setpoints" command and added way to have pending admin responses on commands
 - started on admin controls for points
-- need to suss out how to manage pending responses for admin commands (ie, when the bot asks are you sure you want to do Y?)
-- admin controls to add give/take points. Make polls
+- need to add a quick admin way to add/sub points without using exact amount
+- need to add poll
 
 v1:
 Consistent userlist tracking points and message activity

@@ -31,7 +31,7 @@ class botSocket():
 				print("> "+str(line))
 
 				# build init userlist
-				if(line.split(":")[1].split(" ")[1] == "353"):
+				if(line.split(":", 2)[1].split(" ")[1] == "353"):
 					Users.buildUserList(line)
 				# build init userlist end
 

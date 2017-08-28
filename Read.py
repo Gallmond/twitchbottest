@@ -6,7 +6,7 @@ def getUser(line):
 	user = separate[1].split("!", 1)[0]
 	return user
 def getMessage(line):
-	separate = line.split(":")
+	separate = line.split(":", 2)
 	elems = len(separate)
 	message = separate[elems-1]
 	return message
