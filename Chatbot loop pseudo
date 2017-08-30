@@ -1,8 +1,8 @@
 Last thing I was doing:
-- just finished the "!setpoints" command and added way to have pending admin responses on commands
-- started on admin controls for points
-- need to add a quick admin way to add/sub points without using exact amount
+- just finished the checker if command conf code is taken or not
 - need to add poll
+- need to add a 'use' command (see: dunt)
+- add gracefull way to kill bot
 
 v1:
 Consistent userlist tracking points and message activity

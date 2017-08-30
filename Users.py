@@ -108,14 +108,25 @@ class Users(): # ALWAYS CALL STATICALLY
 
 								# VVVVV MANAGE PENDING ADMIN COMMANDS HERE VVVVV!
 								if command["type"] == "points":
-									newPoints = command["params"]["amnt"]
-									target = command["params"]["target"]
-									Users.userList[target].points = int(newPoints)
 
-									module_share.botObject.sendWhisper("set "+target+"'s points to "+str(newPoints), thisUser)
-									module_share.pending_commands[thisUser].pop(module_share.pending_commands[thisUser].index(command))
+									if command["params"]["mode"] == "set":
+										newPoints = command["params"]["amnt"]
+										target = command["params"]["target"]
+										Users.userList[target].points = int(newPoints)
+										module_share.botObject.sendWhisper("set "+target+"'s points to "+str(newPoints), thisUser)
+										module_share.pending_commands[thisUser].pop(module_share.pending_commands[thisUser].index(command))
+										return True
 
-									return True
+									if command["params"]["mode"] == "add" or command["params"]["mode"] == "subtract":
+										newPoints = command["params"]["amnt"]
+										target = command["params"]["target"]
+										oldPoints = Users.userList[target].points
+										currPoints = Users.userList[target].points + newPoints
+										Users.userList[target].points = int(currPoints)
+										module_share.botObject.sendWhisper("set "+target+"'s points to "+str(currPoints)+" was "+str(oldPoints), thisUser)
+										module_share.pending_commands[thisUser].pop(module_share.pending_commands[thisUser].index(command))
+										return True
+
 								# ^^^^^ MANAGE PENDING ADMIN COMMANDS HERE ^^^^^!
 
 
@@ -127,13 +138,42 @@ class Users(): # ALWAYS CALL STATICALLY
 				if userMessageStarts(_msg, "!points "):
 					#check format
 					userMsgArr = last.split(" ")
-					if len(userMsgArr)!=2:
-						return True # invalid foramt
-					if userMsgArr[1] not in Users.userList:
-						return True # user not exist
-					else:
-						thisUserPoints = Users.userList[userMsgArr[1]].points
-						module_share.botObject.sendWhisper(userMsgArr[1]+" has "+str(thisUserPoints)+" points", thisUser)
+
+					# show points or add/sub?
+
+					if len(userMsgArr)==2: # show points
+						if userMsgArr[1] not in Users.userList:
+							module_share.botObject.sendWhisper("User ["+userMsgArr[1]+"] not in Userlist", thisUser)
+							return True # user not exist
+						else:
+							thisUserPoints = Users.userList[userMsgArr[1]].points
+							module_share.botObject.sendWhisper(userMsgArr[1]+" has "+str(thisUserPoints)+" points", thisUser)
+
+					elif len(userMsgArr)==3: # change points
+						if userMsgArr[1] not in Users.userList:
+							module_share.botObject.sendWhisper("User ["+userMsgArr[1]+"] not in Userlist", thisUser)
+							return True # user not exist
+						else:
+
+							try:
+								changeAmt = int(userMsgArr[2])
+							except ValueError:
+								module_share.botObject.sendWhisper("Bad format ["+userMsgArr[2]+"] is not an int", thisUser)
+								return True
+
+							if changeAmt>0:
+								thisMode = "add"
+							else:
+								thisMode = "subtract"
+
+							#addPendingCommand(userName, commandType, paramDict)
+							thisCommandDict = {"mode":thisMode, "amnt":changeAmt, "target":userMsgArr[1]}
+							thisCommand = addPendingCommand(thisUser, "points", thisCommandDict)
+
+							confString = "reply \"!confirm "+thisCommand["confcode"]+"\" to "+str(thisMode)+" "+str(changeAmt)+" points to/from "+userMsgArr[1]
+							module_share.botObject.sendWhisper(confString, thisUser)
+							return True
+					
 				# !points username end
 
 
@@ -163,15 +203,11 @@ class Users(): # ALWAYS CALL STATICALLY
 						module_share.botObject.sendWhisper("User "+target+" doesn't exist", thisUser)
 						return True
 					pointAmnt = int(last.split(" ")[2])
-
 					targetCurrentPoints = Users.userList[target.lower()].points
-
 					# set pending command
-					thisCommand = addPendingCommand(thisUser, "points", {"amnt": pointAmnt, "target": target})
-
+					thisCommand = addPendingCommand(thisUser, "points", {"mode":"set", "amnt": pointAmnt, "target": target})
 					confString = "reply \"!confirm "+thisCommand["confcode"]+"\" to set "+target+"'s points to "+str(pointAmnt)+"? current amount is "+str(targetCurrentPoints)
 					# "set user's points to X? Current amount is Y"
-
 					module_share.botObject.sendWhisper(confString, thisUser)
 
 					return True
@@ -446,9 +482,19 @@ def addPendingCommand(userName, commandType, paramDict):
 	if userName not in module_share.pending_commands:
 		module_share.pending_commands[userName] = []
 
-	# conf code: 
+	# conf code len: 
 	N = 6
-	confCode = ''.join(random.choices(string.ascii_uppercase, k=N))
+	
+	codeAvail = False
+	print("pending_commands:")
+	print(module_share.pending_commands)
+	while not codeAvail:
+		confCode = ''.join(random.choices(string.ascii_uppercase, k=N))
+		for u in module_share.pending_commands:
+			for c in module_share.pending_commands[u]:
+				if c["confcode"]==confcode:
+					continue
+		break
 
 	# add command
 	now = time.time()
