@@ -1,8 +1,9 @@
 Last thing I was doing:
-- just finished the checker if command conf code is taken or not
-- need to add poll
-- need to add a 'use' command (see: dunt)
-- add gracefull way to kill bot
+- started on poll
+- finish poll checker function
+- add commands to make poll for admins
+- add commands to vote for polls
+
 
 v1:
 Consistent userlist tracking points and message activity

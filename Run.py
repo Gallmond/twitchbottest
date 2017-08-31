@@ -3,6 +3,8 @@ import time
 import module_share
 import socket
 
+from FileManagement import fileManager
+
 from Read import getUser, getMessage, pingPong
 from Socket import botSocket
 from Users import Users, UserPoints
@@ -23,6 +25,7 @@ listeningFunctions.append(Users.UserListener) # listen for user based updates
 
 backgroundFunctions.append(UserPoints.presencePoints) # this adds points for people in the chat
 backgroundFunctions.append(Users.saveUserFile) # this adds points for people in the chat
+backgroundFunctions.append(fileManager.clearPendingCommands) # this adds points for people in the chat
 
 # request permissions
 botObject.requestPermissions()
@@ -38,10 +41,12 @@ while True:
 			
 	s.setblocking(0)
 	s.settimeout(0.33)
+	
 	try:
-		print("recv", end="")
-		readbuffer = readbuffer + s.recv(1024).decode("utf-8")			
+		readbuffer = readbuffer + s.recv(1024).decode("utf-8")	
+		print("")		
 	except socket.timeout:
+		# print(".", sep=' ', end='', flush=True)
 		print(".")
 
 	temp = readbuffer.split("\r\n")

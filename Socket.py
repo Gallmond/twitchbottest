@@ -64,8 +64,6 @@ class botSocket():
 		messageTemp = "PRIVMSG #" + CHANNEL + " :/w "+_username+" "+_msg
 		self.send(messageTemp)
 		print("Whispered: " + messageTemp)
-
-
 		return True
 
 	def send(self, _msg): # print then send directly to socket
@@ -76,4 +74,9 @@ class botSocket():
 			_msg+="\r\n"
 
 		self.activeSocket.send((_msg+"\r\n").encode(encoding='utf-8'))
+		return True
+
+	def leaveChannel(self):
+		cmd = "PART #"+CHANNEL
+		self.send(cmd)
 		return True

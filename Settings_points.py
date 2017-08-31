@@ -4,9 +4,17 @@ POINTS_NAME_PLURAL = "eccies" # user types !POINTS_NAME_PLURAL for bot to tell t
 POINTS_AK_ADD = 1 # how many points are earned just by being in chat
 POINTS_AK_PERIOD = 20 # how many seconds apart the above is added
 
+# points use
+POINTS_USE = "dunt" # user types !POINTS_USER with optional number
 
 # response strings.
 # the parts {like this} are replaced automatically. They don't need to be there though.
+
+# using
+POINTS_USED = "{username} dunted {amountuserd} "+POINTS_NAME_PLURAL+" ooft"
+POINT_USED = "{username} dunted an "+POINTS_NAME
+
+# giving and recieving
 POINTS_BAD_FORMAT = "bad format !give request"
 POINTS_GIFT_SELF = "can't give points to yourself"
 POINTS_NOT_ENOUGH = "Not enough "+POINTS_NAME_PLURAL+" only {pointamount} left"

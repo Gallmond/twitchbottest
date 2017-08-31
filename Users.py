@@ -4,10 +4,13 @@ import time
 import pickle
 import string
 import random
+import sys
 
 from Read import getUser
 from Settings import IDENT, USER_STARTING_POINTS, CHANNEL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
-from Settings_points import POINTS_AK_ADD, POINTS_AK_PERIOD, POINTS_NAME_PLURAL, POINTS_NAME, POINTS_BAD_FORMAT, POINTS_GIFT_SELF, POINTS_NOT_ENOUGH, POINTS_CONFIRM, POINTS_BOT_RESPONSE
+from Settings_points import POINTS_AK_ADD, POINTS_AK_PERIOD, POINTS_NAME_PLURAL, POINTS_NAME, POINTS_BAD_FORMAT, POINTS_GIFT_SELF, POINTS_NOT_ENOUGH, POINTS_CONFIRM, POINTS_BOT_RESPONSE, POINTS_USE, POINTS_USED, POINT_USED
+from polls import poll
+
 class UserPoints():
 
 	lastPresenceCheck = time.time()
@@ -108,7 +111,6 @@ class Users(): # ALWAYS CALL STATICALLY
 
 								# VVVVV MANAGE PENDING ADMIN COMMANDS HERE VVVVV!
 								if command["type"] == "points":
-
 									if command["params"]["mode"] == "set":
 										newPoints = command["params"]["amnt"]
 										target = command["params"]["target"]
@@ -126,12 +128,36 @@ class Users(): # ALWAYS CALL STATICALLY
 										module_share.botObject.sendWhisper("set "+target+"'s points to "+str(currPoints)+" was "+str(oldPoints), thisUser)
 										module_share.pending_commands[thisUser].pop(module_share.pending_commands[thisUser].index(command))
 										return True
+								# type points end
+
+								if command["type"] == "kill":
+									saved = saveUserListToFile(Users.userList)
+									if saved:
+										module_share.botObject.sendWhisper("Saved userlist to file. Killing bot. Bye!", thisUser)
+										module_share.botObject.leaveChannel()
+										sys.exit()
+									else:
+										module_share.botObject.sendWhisper("couldn't save userlist.", thisUser)
+
 
 								# ^^^^^ MANAGE PENDING ADMIN COMMANDS HERE ^^^^^!
-
-
-
 				# check for confirmations of pending commands END
+
+
+				# !poll [option1, option2, option3...] [mm:ss] eg: "!poll [darksouls, tomb raider, harry potter] 05:00"
+
+
+				# !killbot to gracefully kill the bot
+				if userMessageStarts(_msg, "!killbot"):
+					#check format
+					userMsgArr = last.split(" ")
+					if len(userMsgArr)!=1:
+						return True
+					thisCommandDict = {"who":thisUser}
+					thisCommand = addPendingCommand(thisUser, "kill", thisCommandDict)
+					confString = "reply \"!confirm "+thisCommand["confcode"]+"\" to kill the bot gracefully"
+					module_share.botObject.sendWhisper(confString, thisUser)
+				# !killbot to gracefully kill the bot end
 
 
 				# !points username to list specific users points
@@ -181,7 +207,7 @@ class Users(): # ALWAYS CALL STATICALLY
 				if userMessageStarts(_msg, "!allpoints"):
 					outputStr = "|"
 					for key in Users.userList:
-						outputStr+= str(key)+": "+str(Users.userList[key].points)
+						outputStr+= str(key)+": "+str(Users.userList[key].points)+"|"
 
 					# is string too big?
 
@@ -216,9 +242,6 @@ class Users(): # ALWAYS CALL STATICALLY
 
 
 				# ADMIN LISTENING END
-
-
-
 		# ========= WHISPERS FROM MODS END
 
 
@@ -231,6 +254,55 @@ class Users(): # ALWAYS CALL STATICALLY
 			thisUser = middle.split("!")[0]
 
 			logMessage(_msg)
+
+			# user typed "!use n"
+			if userMessageStarts(_msg, "!"+POINTS_USE):
+				# with amount?
+				if len(last.split(" "))==1:
+
+					# POINTS_USE = "dunt" # user types !POINTS_USER with optional number
+					# POINTS_USED = "{username} dunted {amountuserd} "+POINTS_NAME_PLURAL+" ooft"
+					# POINT_USED = "{username} dunted an "+POINTS_NAME
+
+					responseString = POINT_USED
+					responseString = responseString.replace("{username}", thisUser)
+
+					Users.userList[thisUser].points = Users.userList[thisUser].points-1
+
+					if isWhisperType:
+						module_share.botObject.sendWhisper(responseString, thisUser)
+					else:
+						module_share.botObject.sendMessage(responseString)
+					return True
+
+				if len(last.split(" "))==2:
+					#parse num
+					try:
+						amnt = int(last.split(" ")[1])
+					except ValueError:
+						if isWhisperType:
+							module_share.botObject.sendWhisper("bad number format", thisUser)
+						else:
+							module_share.botObject.sendMessage("bad number format")
+						return True
+
+					responseString = POINTS_USED
+					responseString = responseString.replace("{username}", thisUser)
+					responseString = responseString.replace("{amountuserd}", str(amnt))
+
+					Users.userList[thisUser].points = Users.userList[thisUser].points-amnt
+
+					if isWhisperType:
+						module_share.botObject.sendWhisper(responseString, thisUser)
+					else:
+						module_share.botObject.sendMessage(responseString)
+					return True
+
+				if isWhisperType:
+					module_share.botObject.sendWhisper("bad command format ["+last+"]", thisUser)
+				else:
+					module_share.botObject.sendMessage("bad command format ["+last+"]")
+
 
 			# user typed "!points"
 			if userMessageStarts(_msg, "!"+POINTS_NAME_PLURAL): 
@@ -377,10 +449,6 @@ class User():
 # helpers for checking what kind of incoming message
 def userMessageStarts(_msg, _keyword):
 	ma = _msg.split(":", 2)
-	print(ma[2])
-
-	print(_keyword)
-
 	if ma[2].find(_keyword)==-1:
 		return False
 	else:

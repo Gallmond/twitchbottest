@@ -1,19 +1,18 @@
-# {'rubmybum': []}
-# Traceback (most recent call last):
-#   File "C:\Users\Gavin\Desktop\python\Run.py", line 57, in <module>
-#     if f(line):			
-#   File "C:\Users\Gavin\Desktop\python\Users.py", line 171, in UserListener
-#     thisCommand = addPendingCommand(thisUser, "points", thisCommandDict)
-#   File "C:\Users\Gavin\Desktop\python\Users.py", line 494, in addPendingCommand
-#     if c["confcode"]==confcode:
-# TypeError: string indices must be integers
+arr = [["dada", "fafa", "5tg4wtw"], ["th", "fr", "re", "re", "te"], ["fr"]]
 
 
-o = {'rubmybum': []}
-print(o)
-for u in o:
-	print(o[u])
-	for c in o[u]:
-		print(c)
-		if c["confcode"]==confcode:
-			continue
+class wowow():
+	optionsArr = [["dada", "fafa", "5tg4wtw"], ["th", "fr", "re", "re", "te"], ["fr"]]
+
+	def result(self):
+		sortedArr = sorted(self.optionsArr, key=lambda optionsArr: len(optionsArr), reverse=True)
+		self.sortedArr = sortedArr
+
+
+
+
+neww = wowow()
+print(neww.optionsArr)
+neww.result()
+print(neww.sortedArr)
+

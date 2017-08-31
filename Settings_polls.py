@@ -1,0 +1,1 @@
+POLL_TIME_LIMIT = 300 # default poll time limit in seconds. 300 is five minutes
