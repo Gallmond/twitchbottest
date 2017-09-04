@@ -7,7 +7,7 @@ import random
 import sys
 
 from Read import getUser
-from Settings import IDENT, USER_STARTING_POINTS, CHANNEL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
+from Settings import HELP_STRING, IDENT, USER_STARTING_POINTS, CHANNEL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
 from Settings_points import POINTS_AK_ADD, POINTS_AK_PERIOD, POINTS_NAME_PLURAL, POINTS_NAME, POINTS_BAD_FORMAT, POINTS_GIFT_SELF, POINTS_NOT_ENOUGH, POINTS_CONFIRM, POINTS_BOT_RESPONSE, POINTS_USE, POINTS_USED, POINT_USED
 from polls import poll
 
@@ -255,6 +255,18 @@ class Users(): # ALWAYS CALL STATICALLY
 
 			logMessage(_msg)
 
+			# user typed "!help"
+			if userMessageStarts(_msg, "!help"):
+				if len(last.split(" "))==1:
+					#normal help
+					if isWhisperType:
+						module_share.botObject.sendWhisper(HELP_STRING, thisUser)
+					else:
+						module_share.botObject.sendMessage(HELP_STRING)
+
+					return True
+
+
 			# user typed "!use n"
 			if userMessageStarts(_msg, "!"+POINTS_USE):
 				# with amount?
@@ -317,7 +329,7 @@ class Users(): # ALWAYS CALL STATICALLY
 
 				return True
 			
-			# user typed !give username X eccies
+			# user typed !give username X
 			if userMessageStarts(_msg, "!give"): 
 				tempmsg = _msg.replace("\r\n","")
 				if tempmsg.find(POINTS_NAME_PLURAL) == len(tempmsg)-len(POINTS_NAME_PLURAL) or tempmsg.find("1 "+POINTS_NAME) == len(tempmsg)-len("1 "+POINTS_NAME): # message ends with the plural name
@@ -398,7 +410,7 @@ class Users(): # ALWAYS CALL STATICALLY
 		if(_msg.find("JOIN #"+CHANNEL+"\r\n")==len(_msg)-len("JOIN #"+CHANNEL+"\r\n")): # check if msg ends "JOIN #channelname"
 			# get username
 			newUserName = _msg.split("!")[0][1:].replace("\r\n", "")
-			return Users.newUser(newUserName)
+			return Users.addNewUser(newUserName)
 		#elif():
 
 		# example with tags of ronni joining channel:
@@ -428,6 +440,7 @@ class Users(): # ALWAYS CALL STATICALLY
 		thisUser = User(_userName, now)
 		Users.userList[_userName] = thisUser
 		print("created new user "+thisUser.username)
+		sendWelcomeMessage(userName)
 		return _userName
 
 
@@ -443,6 +456,7 @@ class User():
 		self.points = USER_STARTING_POINTS
 		self.messages = [] # [[timestamp, "messagetext"],[timestamp, "messagetext"], ...]
 		self.inChannel = True
+		self.newUser = True
 
 
 
@@ -569,3 +583,8 @@ def addPendingCommand(userName, commandType, paramDict):
 	thisCommand = {"confcode":confCode, "type":commandType, "time": now, "params": paramDict}
 	module_share.pending_commands[userName].append(thisCommand)
 	return thisCommand
+
+def sendWelcomeMessage(userName):
+	if Users.userList[userName].newUser == True:
+		module_share.botObject.sendWhisper("Welcome to "+CHANNEL+" channel. User !help to get a list of available commands. You've got 50 "+POINTS_NAME_PLURAL+" to start out!", userName)
+		Users.userList[userName].newUser = False

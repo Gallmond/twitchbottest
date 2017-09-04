@@ -16,6 +16,7 @@ backgroundFunctions = [] # this just does stuff on timers
 # init users
 Users.customInit()
 module_share.pending_commands = {}
+module_share.all_polls = []
 
 botObject = botSocket()
 module_share.botObject = botObject

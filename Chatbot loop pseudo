@@ -1,8 +1,7 @@
 Last thing I was doing:
-- started on poll
-- finish poll checker function
-- add commands to make poll for admins
-- add commands to vote for polls
+- started on added a simple !help response and a response for new users
+- add poll creation and voting commands
+- add poll listening functions for said commands
 
 
 v1:
@@ -13,13 +12,16 @@ polls
 !game command with timer
 
 v2:
-Can it be made to work across multiple channels simultaniously?
 Bets
 Lottery
 Leaderboards
 
 v3:
+web interface
+db storage
 
+4v:
+multiple channel activity
 
 =============================== user class
 - array of users
