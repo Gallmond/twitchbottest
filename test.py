@@ -3,15 +3,15 @@ import module_share
 
 module_share.all_polls = []
 
-x = poll(["foo","bar"], -20);
+x = poll("Fave Harry Potter char?",["harry's balls","ron's arse","hedwig's knob","snape's turd"], -20);
 addPoll(x)
 
 print(x.confCode)
 
 # cast a vote
-pollManager.voteWasCast("barry", "foo")
-pollManager.voteWasCast("farry", "foo")
-pollManager.voteWasCast("warry", "bar")
+pollManager.voteWasCast("barry", "ron")
+pollManager.voteWasCast("farry", "ron")
+pollManager.voteWasCast("warry", "hedwig")
 
 for p in module_share.all_polls:
 	print(p.optionsArr)
@@ -25,26 +25,10 @@ for p in module_share.all_polls:
 	print(p.returnResultsString())
 
 
-i = 0
-while i < 5:
-	print(i)
-	i+=1
+print("======")
+print("======")
+print("======")
 
-# arr = [["dada", "fafa", "5tg4wtw"], ["th", "fr", "re", "re", "te"], ["fr"]]
-
-
-# class wowow():
-# 	optionsArr = [["dada", "fafa", "5tg4wtw"], ["th", "fr", "re", "re", "te"], ["fr"]]
-
-# 	def result(self):
-# 		sortedArr = sorted(self.optionsArr, key=lambda optionsArr: len(optionsArr), reverse=True)
-# 		self.sortedArr = sortedArr
-
-
-
-
-# neww = wowow()
-# print(neww.optionsArr)
-# neww.result()
-# print(neww.sortedArr)
-
+sss = "fun string last word is woooo"
+lastspace = sss.rfind(" ")
+print(sss[lastspace+1:])

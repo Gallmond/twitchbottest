@@ -9,7 +9,7 @@ import sys
 from Read import getUser
 from Settings import HELP_STRING, IDENT, USER_STARTING_POINTS, CHANNEL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
 from Settings_points import POINTS_AK_ADD, POINTS_AK_PERIOD, POINTS_NAME_PLURAL, POINTS_NAME, POINTS_BAD_FORMAT, POINTS_GIFT_SELF, POINTS_NOT_ENOUGH, POINTS_CONFIRM, POINTS_BOT_RESPONSE, POINTS_USE, POINTS_USED, POINT_USED
-from polls import poll
+from polls import poll, pollManager, addPoll
 
 class UserPoints():
 
@@ -144,7 +144,34 @@ class Users(): # ALWAYS CALL STATICALLY
 				# check for confirmations of pending commands END
 
 
-				# !poll [option1, option2, option3...] [mm:ss] eg: "!poll [darksouls, tomb raider, harry potter] 05:00"
+				# !poll question [op1, op2, op...] seconds eg: !poll How long until gav dies? [ten mins, five mins, never] 500
+				# eg "!poll this is the question [option one, option two, option three] 10"
+				if userMessageStarts(_msg, "!poll"):
+					# get the brackets string
+					openIndex = last.find("[")
+					closeIndex = last.find("]")
+					justOptions = last[openIndex+1:closeIndex]
+					optionsArr = justOptions.split(",")
+					cleanOptions = []				
+					for option in optionsArr:
+						cleanOptions.append(option.strip()) # cleanOptions is now an array of the options
+
+					# get the quesstion (everything between the !poll command and the opening options bracket)
+					justQuestion = last[6:openIndex].strip() # justQuestion is now a string of the poll question
+
+					# get the time in seconds
+					lastSpace = last.rfind(" ")
+					timeString = last[lastSpace+1:]
+
+					newPoll = poll(justQuestion, cleanOptions, int(timeString))
+					addPoll(newPoll)
+					print("added poll")
+
+
+
+
+
+
 
 
 				# !killbot to gracefully kill the bot

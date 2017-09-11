@@ -25,6 +25,13 @@ class pollManager(): # STATiC ONLY
 def addPoll(pollObj):
 	if pollObj not in module_share.all_polls:
 		module_share.all_polls.append(pollObj)
+		# echo the poll question
+		module_share.botObject.sendMessage(pollObj.questionStr)
+		module_share.botObject.sendMessage(pollObj.returnVoteInstructions())
+
+		# print(pollObj.questionStr)
+		# print(pollObj.returnVoteInstructions())
+
 		return True
 	else:
 		return False
@@ -39,18 +46,19 @@ class poll():
 
 	created = time.time()
 	confCode = ""
+	questionStr = ""
 	optionsArr = {}
 	timeoutSeconds = POLL_TIME_LIMIT
 	ended = False
 	numOfTopResults = 3
 
-	def __init__(self, _optionsArr, timer):
+	def __init__(self, _questionStr, _optionsArr, timer):
 		for i in _optionsArr:
 			self.optionsArr[i] = []
 		self.timeoutSeconds = timer
+		self.questionStr = _questionStr
 		N = 6
 		self.confCode = ''.join(random.choices(string.ascii_uppercase, k=N))
-
 
 	def voteFor(self, _votingUserName, _verboseVote):
 		for i in self.optionsArr:
@@ -59,10 +67,27 @@ class poll():
 				return True
 		return False
 
-	def results(self):
+	def results(self): #d, key=lambda k: len(d[k]), reverse=True
+		sortedArr = sorted(self.optionsArr, key=lambda k: len(self.optionsArr[k]), reverse=True)
+		self.resultsArr = sortedArr
+		print(sortedArr)
+		return sortedArr
+
+	def results_old(self):
+		# THIS ISNT WORKING
 		sortedArr = sorted(self.optionsArr, key=lambda optionsArr: len(optionsArr), reverse=True)
 		self.resultsArr = sortedArr
+		print(sortedArr)
 		return sortedArr
+
+	def returnVoteInstructions(self):
+		optionsWords = []
+		for option in self.optionsArr:
+			optionsWords.append(option)
+
+		returnString = "Type !vote followed by: \""+("\", \"".join(optionsWords))+"\" to vote for that option. eg: \"!vote "+optionsWords[0]+"\""
+		
+		return returnString
 
 	def returnCommandString(self):
 		returnString = "\"!poll "+self.confCode+" cancel\" to cancel poll. "
@@ -87,12 +112,14 @@ class poll():
 		i = 0
 		for k in resultsList:
 			thisCount = len(self.optionsArr[k])
+			if thisCount == 0:
+				break
 			thisPercentage = (thisCount/totalVoteNumber)*100
 			resultsPart.append(k+":"+str(thisCount)+"("+str(round(thisPercentage,2))+"%)") #someoption(100/50%)'
 			i+=1
 			if i >= self.numOfTopResults:
 				break
-		returnString = "poll ended! top results: "+(", ".join(resultsPart))
+		returnString = "Poll results: "+(", ".join(resultsPart))
 		return returnString
 
 
