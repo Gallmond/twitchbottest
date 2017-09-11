@@ -2,6 +2,7 @@ Last thing I was doing:
 - did some poll stuff. Added the parsing of the poll creation command.
 - need to add the parsing of the actual voting commands for users (and send command instructions to the creating mod)
 - add parsing of the confirm commands for the poll
+- add an example env
 
 
 
