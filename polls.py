@@ -2,6 +2,7 @@ import time
 import module_share
 import string
 import random
+import re
 
 from Settings_polls import POLL_TIME_LIMIT, POLL_CHECK_FREQUENCY
 
@@ -18,23 +19,19 @@ class pollManager(): # STATiC ONLY
 	def voteWasCast(_votingUserName, _verboseVote):
 		# check all options in all active polls
 		for pollObj in module_share.all_polls:
-			pollObj.voteFor(_votingUserName, _verboseVote)
-
-
-
-def addPoll(pollObj):
-	if pollObj not in module_share.all_polls:
-		module_share.all_polls.append(pollObj)
-		# echo the poll question
-		module_share.botObject.sendMessage(pollObj.questionStr)
-		module_share.botObject.sendMessage(pollObj.returnVoteInstructions())
-
-		# print(pollObj.questionStr)
-		# print(pollObj.returnVoteInstructions())
-
-		return True
-	else:
+			if pollObj.voteFor(_votingUserName, _verboseVote):
+				return True
 		return False
+
+
+def addPoll(_pollObj):
+	print(module_share.all_polls)
+	print(_pollObj)
+	module_share.all_polls.append(_pollObj)
+	# echo the poll question
+	module_share.botObject.sendMessage(_pollObj.questionStr)
+	module_share.botObject.sendMessage(_pollObj.returnVoteInstructions())
+	return True
 
 def getPollByCode(code):
 	for pollObj in module_share.all_polls:
@@ -44,15 +41,18 @@ def getPollByCode(code):
 
 class poll():
 
-	created = time.time()
-	confCode = ""
-	questionStr = ""
-	optionsArr = {}
-	timeoutSeconds = POLL_TIME_LIMIT
-	ended = False
-	numOfTopResults = 3
-
 	def __init__(self, _questionStr, _optionsArr, timer):
+		
+		#defaults
+		self.created = time.time()
+		self.confCode = ""
+		self.questionStr = ""
+		self.optionsArr = {}
+		self.timeoutSeconds = POLL_TIME_LIMIT
+		self.ended = False
+		self.numOfTopResults = 3
+		self.allVoters = []
+
 		for i in _optionsArr:
 			self.optionsArr[i] = []
 		self.timeoutSeconds = timer
@@ -61,21 +61,18 @@ class poll():
 		self.confCode = ''.join(random.choices(string.ascii_uppercase, k=N))
 
 	def voteFor(self, _votingUserName, _verboseVote):
+		if _votingUserName in self.allVoters:
+			return False
 		for i in self.optionsArr:
-			if _verboseVote.lower() == i.lower():
+			if re.sub('[^0-9a-zA-Z ]', '', _verboseVote.lower()) == re.sub('[^0-9a-zA-Z ]', '', i.lower()):
+			# if _verboseVote.lower() == i.lower():
+				self.allVoters.append(_votingUserName)
 				self.optionsArr[i].append(_votingUserName)
 				return True
 		return False
 
 	def results(self): #d, key=lambda k: len(d[k]), reverse=True
 		sortedArr = sorted(self.optionsArr, key=lambda k: len(self.optionsArr[k]), reverse=True)
-		self.resultsArr = sortedArr
-		print(sortedArr)
-		return sortedArr
-
-	def results_old(self):
-		# THIS ISNT WORKING
-		sortedArr = sorted(self.optionsArr, key=lambda optionsArr: len(optionsArr), reverse=True)
 		self.resultsArr = sortedArr
 		print(sortedArr)
 		return sortedArr

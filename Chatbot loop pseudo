@@ -1,10 +1,13 @@
 Last thing I was doing:
-- did some poll stuff. Added the parsing of the poll creation command.
+- more poll stuff. Just fixed the issue causing the second poll to merge with the first (test this though)
 - need to add the parsing of the actual voting commands for users (and send command instructions to the creating mod)
 - add parsing of the confirm commands for the poll
+- add poll timing out
 - add an example env
 
+/w gavin_test_bot !poll Best colour? [red, blue, orange] 50
 
+/w gavin_test_bot !poll Best spell? [abra, kedabra, alakazam] 50
 
 v1:
 Consistent userlist tracking points and message activity

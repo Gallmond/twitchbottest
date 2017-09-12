@@ -163,15 +163,14 @@ class Users(): # ALWAYS CALL STATICALLY
 					lastSpace = last.rfind(" ")
 					timeString = last[lastSpace+1:]
 
+					# construct poll
 					newPoll = poll(justQuestion, cleanOptions, int(timeString))
 					addPoll(newPoll)
-					print("added poll")
-
-
-
-
-
-
+					
+					# message mod with commandlist
+					module_share.botObject.sendWhisper(newPoll.returnCommandString(), thisUser)
+					return True
+				# poll creation command END
 
 
 				# !killbot to gracefully kill the bot
@@ -281,6 +280,20 @@ class Users(): # ALWAYS CALL STATICALLY
 			thisUser = middle.split("!")[0]
 
 			logMessage(_msg)
+
+			# user voted in poll
+			if userMessageStarts(_msg, "!vote "):
+				#get option
+				voteOption = last.split(" ",1)
+				if len(voteOption)!=2:
+					return True
+
+				#cast vote
+				if pollManager.voteWasCast(thisUser, voteOption[1]):
+					print("user "+thisUser+" voted for "+voteOption[1])
+				else:
+					print("user "+thisUser+" could not vote for "+voteOption[1])
+
 
 			# user typed "!help"
 			if userMessageStarts(_msg, "!help"):
