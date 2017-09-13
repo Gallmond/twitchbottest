@@ -144,9 +144,45 @@ class Users(): # ALWAYS CALL STATICALLY
 				# check for confirmations of pending commands END
 
 
-				# !poll question [op1, op2, op...] seconds eg: !poll How long until gav dies? [ten mins, five mins, never] 500
-				# eg "!poll this is the question [option one, option two, option three] 10"
-				if userMessageStarts(_msg, "!poll"):
+				# !pollcancel [poll conf code]
+				if userMessageStarts(_msg, "!pollcancel "):
+					if len(last.split(" "))!=2:
+						return False
+					confCode = last.split(" ")[1]
+					if pollManager.cancelPoll(thisUser, confCode):
+						module_share.botObject.sendWhisper("cancelled poll", thisUser)
+					else:
+						module_share.botObject.sendWhisper("couldn't cancel poll", thisUser)
+				# !pollcancel [poll conf code] END
+
+				# !pollstatus [poll conf code]
+				if userMessageStarts(_msg, "!pollstatus "):
+					if len(last.split(" "))!=2:
+						return False
+					confCode = last.split(" ")[1]
+					pollString = pollManager.pollStatus(thisUser, confCode)
+					if pollString != False:
+						module_share.botObject.sendWhisper(pollString, thisUser)
+					else:
+						module_share.botObject.sendWhisper("Couldn't get poll status", thisUser)
+				# !pollstatus [poll conf code] END
+
+
+				# !pollend [poll conf code]
+				if userMessageStarts(_msg, "!pollend "):
+					if len(last.split(" "))!=2:
+						return False
+					confCode = last.split(" ")[1]
+					ended = pollManager.manualEndPoll(thisUser, confCode)
+					if ended:
+						module_share.botObject.sendWhisper("poll manually  ended", thisUser)
+					else:
+						module_share.botObject.sendWhisper("Couldn't manually end poll", thisUser)
+				# !pollend [poll conf code] END
+
+
+				# "!poll this is the question [option one, option two, option three] 10"
+				if userMessageStarts(_msg, "!poll "):
 					# get the brackets string
 					openIndex = last.find("[")
 					closeIndex = last.find("]")
@@ -225,7 +261,6 @@ class Users(): # ALWAYS CALL STATICALLY
 							confString = "reply \"!confirm "+thisCommand["confcode"]+"\" to "+str(thisMode)+" "+str(changeAmt)+" points to/from "+userMsgArr[1]
 							module_share.botObject.sendWhisper(confString, thisUser)
 							return True
-					
 				# !points username end
 
 

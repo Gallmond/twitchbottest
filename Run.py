@@ -45,10 +45,11 @@ while True:
 	
 	try:
 		readbuffer = readbuffer + s.recv(1024).decode("utf-8")	
-		print("")		
+		# print("")		
 	except socket.timeout:
 		# print(".", sep=' ', end='', flush=True)
-		print(".")
+		# print(".")
+		tempvar = ""
 
 	temp = readbuffer.split("\r\n")
 	readbuffer = temp.pop()	

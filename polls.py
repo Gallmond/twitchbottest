@@ -23,6 +23,30 @@ class pollManager(): # STATiC ONLY
 				return True
 		return False
 
+	def cancelPoll(_userRequesting, _confCode):
+		thisPoll = getPollByCode(_confCode)
+		if thisPoll == False:
+			return False
+		# just delete the poll, no other action needed
+		try:
+			module_share.all_polls.remove(thisPoll)
+			return True
+		except ValueError:
+			return False
+
+	def pollStatus(_userRequesting, _confCode):
+		thisPoll = getPollByCode(_confCode)
+		if thisPoll == False:
+			return False
+		return thisPoll.returnCurrentStatusString()
+
+	def manualEndPoll(_userRequesting, _confCode):
+		thisPoll = getPollByCode(_confCode)
+		if thisPoll == False:
+			return False
+		return thisPoll.end()
+
+
 
 def addPoll(_pollObj):
 	print(module_share.all_polls)
@@ -87,9 +111,9 @@ class poll():
 		return returnString
 
 	def returnCommandString(self):
-		returnString = "\"!poll "+self.confCode+" cancel\" to cancel poll. "
-		returnString+= "\"!poll "+self.confCode+" end\" to end poll early. "
-		returnString+= "\"!poll "+self.confCode+" status\" to see current votes. "
+		returnString = "\"!pollcancel "+self.confCode+"\" to cancel poll. "
+		returnString+= "\"!pollend "+self.confCode+"\" to end poll early. "
+		returnString+= "\"!pollstatus "+self.confCode+"\" to see current votes. "
 		return returnString
 
 	def totalVotes(self):
@@ -98,6 +122,26 @@ class poll():
 			for name in self.optionsArr[option]:
 				n+=1
 		return n
+
+	def returnCurrentStatusString(self):
+		#return True
+		totalVoteNumber = self.totalVotes()
+		resultsList = self.results()
+		print(resultsList)
+		resultsPart = []
+		# get top X results
+		i = 0
+		for k in resultsList:
+			thisCount = len(self.optionsArr[k])
+			if thisCount == 0:
+				break
+			thisPercentage = (thisCount/totalVoteNumber)*100
+			resultsPart.append(k+":"+str(thisCount)+"("+str(round(thisPercentage,2))+"%)") #someoption(100/50%)'
+			i+=1
+			if i >= self.numOfTopResults:
+				break
+		returnString = "Current votes: "+(", ".join(resultsPart))
+		return returnString
 
 	def returnResultsString(self):
 		#return True
@@ -116,16 +160,12 @@ class poll():
 			i+=1
 			if i >= self.numOfTopResults:
 				break
-		returnString = "Poll results: "+(", ".join(resultsPart))
+		returnString = "Results "+self.questionStr+": "+(", ".join(resultsPart)) # Results question here: someoption:100(50%), anotheroption:48(22%), thirdoption:12(5%)
 		return returnString
-
-
-
-
-
-
-		# poll ended! top results: someoption(100/50%), anotheroption(48/22%), thirdoption(12/5%)
-
+		
 	def end(self):
 		self.ended = True;
 		# send results to chat
+		module_share.botObject.sendMessage(self.returnResultsString())
+		module_share.all_polls.remove(self)
+		return True

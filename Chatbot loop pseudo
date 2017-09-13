@@ -1,8 +1,6 @@
 Last thing I was doing:
-- more poll stuff. Just fixed the issue causing the second poll to merge with the first (test this though)
-- need to add the parsing of the actual voting commands for users (and send command instructions to the creating mod)
-- add parsing of the confirm commands for the poll
-- add poll timing out
+- added the manual admin commands to manage the poll.
+- add normal poll timing out via the time set on creation
 - add an example env
 
 /w gavin_test_bot !poll Best colour? [red, blue, orange] 50

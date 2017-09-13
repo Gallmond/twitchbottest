@@ -1,27 +1,52 @@
 class fun_Obj():
 
-	fun_arr = []
-
 	def __init__(self, coolWord):
-		self.fun_arr.append(coolWord)
+		self.name = coolWord
 
-	def printArr(self):
-		print(self.fun_arr)
+	def printName(self):
+		print(self.name)
+
+	def delSelf(self):
+		allobjs.remove(self)
+
+def getObByName(_name):
+	for ob in allobjs:
+		if ob.name == _name:
+			return ob
+	return False
 
 
 allobjs = []
 
 fun_1 = fun_Obj("foo")
 fun_2 = fun_Obj("bar")
+fun_3 = fun_Obj("deleteme")
 
 allobjs.append(fun_1)
 allobjs.append(fun_2)
+allobjs.append(fun_3)
+
+print(allobjs)
 
 for ob in allobjs:
-	ob.printArr()
+	ob.printName()
 
+returnedOb = getObByName("deleteme")
 
+if returnedOb in allobjs:
+	print("foundit")
+	# allobjs.remove(returnedOb)
+	returnedOb.delSelf()
 
+print(allobjs)
+
+for ob in allobjs:
+	ob.printName()
+
+try:
+	allobjs.remove(returnedOb)
+except ValueError:
+	print("no val")
 
 class funClass():
 	static_variable = "hiya"
