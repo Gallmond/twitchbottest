@@ -8,6 +8,7 @@ from FileManagement import fileManager
 from Read import getUser, getMessage, pingPong
 from Socket import botSocket
 from Users import Users, UserPoints
+from polls import pollManager
 
 # listening functions should return true if they are to break the loop
 listeningFunctions = [] # this reacts to incoming lines
@@ -27,6 +28,7 @@ listeningFunctions.append(Users.UserListener) # listen for user based updates
 backgroundFunctions.append(UserPoints.presencePoints) # this adds points for people in the chat
 backgroundFunctions.append(Users.saveUserFile) # this adds points for people in the chat
 backgroundFunctions.append(fileManager.clearPendingCommands) # this adds points for people in the chat
+backgroundFunctions.append(pollManager.pollsChecker) # this checks for polls to end
 
 # request permissions
 botObject.requestPermissions()

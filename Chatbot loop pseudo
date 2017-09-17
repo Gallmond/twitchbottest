@@ -1,6 +1,5 @@
 Last thing I was doing:
-- added the manual admin commands to manage the poll.
-- add normal poll timing out via the time set on creation
+- added proper poll timeout checker
 - add an example env
 
 /w gavin_test_bot !poll Best colour? [red, blue, orange] 50

@@ -106,7 +106,7 @@ class poll():
 		for option in self.optionsArr:
 			optionsWords.append(option)
 
-		returnString = "Type !vote followed by: \""+("\", \"".join(optionsWords))+"\" to vote for that option. eg: \"!vote "+optionsWords[0]+"\""
+		returnString = "Type !vote followed by: \""+("\", \"".join(optionsWords))+"\" to vote for that option. eg: \"!vote "+optionsWords[0]+"\". Ends in "+str(self.timeoutSeconds)+" seconds."
 		
 		return returnString
 
