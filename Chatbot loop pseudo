@@ -1,6 +1,7 @@
 Last thing I was doing:
-- added proper poll timeout checker
-- add an example env
+- start on bets (MATHS????)
+-- similar to simple poll, but with payouts in points. One bet per person? Does amount affect payout?
+-- no timeouts, must be ended manually?
 
 /w gavin_test_bot !poll Best colour? [red, blue, orange] 50
 
