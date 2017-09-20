@@ -1,58 +1,119 @@
-class fun_Obj():
+houseTake = 0.05 # 5%
 
-	def __init__(self, coolWord):
-		self.name = coolWord
+bets = {
+	"orange":{"barry":25,"gavin":50,"terry":100},
+	"blue":{"harry":90,"james":40},
+	"green":{"ron":60,"july":70},
+	"yellow":{"fred":15}
+}
 
-	def printName(self):
-		print(self.name)
+# test overwhelming winner
+bets = {
+	"orange":{"barry":25,"gavin":50,"terry":100,"roger":30,"grace":50,"lauren":75,"alex":50,"hollie":30},
+	"blue":{"harry":90,"james":40}
+}
 
-	def delSelf(self):
-		allobjs.remove(self)
+print("all bets:")
+print(bets)
 
-def getObByName(_name):
-	for ob in allobjs:
-		if ob.name == _name:
-			return ob
-	return False
+winTotals = {}
+totalPool = 0
+
+for colour in bets:
+	winTotals[colour] = 0
+	for better in bets[colour]:
+		winTotals[colour] += bets[colour][better]
+		totalPool+= bets[colour][better]
+
+winner = "orange"
+
+print("total pool:"+str(totalPool))
+print("house take is: "+str(houseTake))
+
+poolMinusTake = round(totalPool-(totalPool*houseTake),2)
+print("pool sans the houses take of "+str((totalPool*houseTake))+" is "+str(poolMinusTake))
+
+calcNumber = round(poolMinusTake/winTotals[winner],2)
+print("payout odds based on amount bet:"+str(calcNumber))
+
+# so the people get back their stake x that number
+payoutTotal = 0
+for name in bets[winner]:
+	thisPayout = bets[winner][name]*calcNumber
+	payoutTotal+= thisPayout
+	print(name+" gets "+str(thisPayout))
+
+print("total payout was: "+str(payoutTotal))
+print("calculated house take plus payout is "+str((totalPool*houseTake)+payoutTotal))
+
+ #$881.51 / $110.00 = 8.01
+
+#poolminustake / winningpool = 
+
+# 	orange:
+# 		barry: 25
+# 		gavin: 50
+# 		terry: 100
+
+# 	blue:
+# 		harry: 90
+# 		james: 40
+
+# class fun_Obj():
+
+# 	def __init__(self, coolWord):
+# 		self.name = coolWord
+
+# 	def printName(self):
+# 		print(self.name)
+
+# 	def delSelf(self):
+# 		allobjs.remove(self)
+
+# def getObByName(_name):
+# 	for ob in allobjs:
+# 		if ob.name == _name:
+# 			return ob
+# 	return False
 
 
-allobjs = []
+# allobjs = []
 
-fun_1 = fun_Obj("foo")
-fun_2 = fun_Obj("bar")
-fun_3 = fun_Obj("deleteme")
+# fun_1 = fun_Obj("foo")
+# fun_2 = fun_Obj("bar")
+# fun_3 = fun_Obj("deleteme")
 
-allobjs.append(fun_1)
-allobjs.append(fun_2)
-allobjs.append(fun_3)
+# allobjs.append(fun_1)
+# allobjs.append(fun_2)
+# allobjs.append(fun_3)
 
-print(allobjs)
+# print(allobjs)
 
-for ob in allobjs:
-	ob.printName()
+# for ob in allobjs:
+# 	ob.printName()
 
-returnedOb = getObByName("deleteme")
+# returnedOb = getObByName("deleteme")
 
-if returnedOb in allobjs:
-	print("foundit")
-	# allobjs.remove(returnedOb)
-	returnedOb.delSelf()
+# if returnedOb in allobjs:
+# 	print("foundit")
+# 	# allobjs.remove(returnedOb)
+# 	returnedOb.delSelf()
 
-print(allobjs)
+# print(allobjs)
 
-for ob in allobjs:
-	ob.printName()
+# for ob in allobjs:
+# 	ob.printName()
 
-try:
-	allobjs.remove(returnedOb)
-except ValueError:
-	print("no val")
+# try:
+# 	allobjs.remove(returnedOb)
+# except ValueError:
+# 	print("no val")
 
-class funClass():
-	static_variable = "hiya"
+# class funClass():
+# 	static_variable = "hiya"
 
-	def __init__(self):
-		instance_variable = "iruni is hot" 
+# 	def __init__(self):
+# 		instance_variable = "iruni is hot" 
 
 
 

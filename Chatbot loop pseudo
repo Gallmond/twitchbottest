@@ -105,3 +105,8 @@ character limits:
 modded: 500 chars
 unmodded: 50 chars
 whispers: 500 chars
+
+
+
+
+If I have X many options to bet on with unknown odds of winning, what maths is used at payout time to calculate how much the winners get relative to their stake such that they always get more than their stake back, and that the "house" doesn't have to top up the pool to meet the amount (and in fact can skim off it too)?
