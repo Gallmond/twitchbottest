@@ -1,50 +1,52 @@
-houseTake = 0.05 # 5%
 
-bets = {
-	"orange":{"barry":25,"gavin":50,"terry":100},
-	"blue":{"harry":90,"james":40},
-	"green":{"ron":60,"july":70},
-	"yellow":{"fred":15}
-}
 
-# test overwhelming winner
-bets = {
-	"orange":{"barry":25,"gavin":50,"terry":100,"roger":30,"grace":50,"lauren":75,"alex":50,"hollie":30},
-	"blue":{"harry":90,"james":40}
-}
+# houseTake = 0.05 # 5%
 
-print("all bets:")
-print(bets)
+# bets = {
+# 	"orange":{"barry":25,"gavin":50,"terry":100},
+# 	"blue":{"harry":90,"james":40},
+# 	"green":{"ron":60,"july":70},
+# 	"yellow":{"fred":15}
+# }
 
-winTotals = {}
-totalPool = 0
+# # test overwhelming winner
+# bets = {
+# 	"orange":{"barry":25,"gavin":50,"terry":100,"roger":30,"grace":50,"lauren":75,"alex":50,"hollie":30},
+# 	"blue":{"harry":90,"james":40}
+# }
 
-for colour in bets:
-	winTotals[colour] = 0
-	for better in bets[colour]:
-		winTotals[colour] += bets[colour][better]
-		totalPool+= bets[colour][better]
+# print("all bets:")
+# print(bets)
 
-winner = "orange"
+# winTotals = {}
+# totalPool = 0
 
-print("total pool:"+str(totalPool))
-print("house take is: "+str(houseTake))
+# for colour in bets:
+# 	winTotals[colour] = 0
+# 	for better in bets[colour]:
+# 		winTotals[colour] += bets[colour][better]
+# 		totalPool+= bets[colour][better]
 
-poolMinusTake = round(totalPool-(totalPool*houseTake),2)
-print("pool sans the houses take of "+str((totalPool*houseTake))+" is "+str(poolMinusTake))
+# winner = "orange"
 
-calcNumber = round(poolMinusTake/winTotals[winner],2)
-print("payout odds based on amount bet:"+str(calcNumber))
+# print("total pool:"+str(totalPool))
+# print("house take is: "+str(houseTake))
 
-# so the people get back their stake x that number
-payoutTotal = 0
-for name in bets[winner]:
-	thisPayout = bets[winner][name]*calcNumber
-	payoutTotal+= thisPayout
-	print(name+" gets "+str(thisPayout))
+# poolMinusTake = round(totalPool-(totalPool*houseTake),2)
+# print("pool sans the houses take of "+str((totalPool*houseTake))+" is "+str(poolMinusTake))
 
-print("total payout was: "+str(payoutTotal))
-print("calculated house take plus payout is "+str((totalPool*houseTake)+payoutTotal))
+# calcNumber = round(poolMinusTake/winTotals[winner],2)
+# print("payout odds based on amount bet:"+str(calcNumber))
+
+# # so the people get back their stake x that number
+# payoutTotal = 0
+# for name in bets[winner]:
+# 	thisPayout = round(bets[winner][name]*calcNumber)
+# 	payoutTotal+= thisPayout
+# 	print(name+" gets "+str(thisPayout))
+
+# print("total payout was: "+str(payoutTotal))
+# print("calculated house take plus payout is "+str((totalPool*houseTake)+payoutTotal))
 
  #$881.51 / $110.00 = 8.01
 

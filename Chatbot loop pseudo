@@ -1,7 +1,11 @@
 Last thing I was doing:
-- start on bets (MATHS????)
--- similar to simple poll, but with payouts in points. One bet per person? Does amount affect payout?
--- no timeouts, must be ended manually?
+- started on bets
+- add make bet command
+- add add stake command
+- add admin commands for the bet (cancel, end, check status)
+- check multi-word poll/bet options can be voted on
+- poll and bet creation to have confirmation commands, not instant creation
+
 
 /w gavin_test_bot !poll Best colour? [red, blue, orange] 50
 

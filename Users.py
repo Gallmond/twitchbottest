@@ -39,6 +39,13 @@ class UserPoints():
 			print("added "+str(pamnt)+" points to "+str(usernm)+" users")
 			# add X points to every user present in chat
 
+	def betPayout(_calculatedArr):
+		for better in _calculatedArr[0]:
+			# get this user
+			thisUserObj = Users.userList[better]
+			newTotal = UserPoints.add(thisUserObj, _calculatedArr[0][better])
+		return True
+
 
 class Users(): # ALWAYS CALL STATICALLY 
 
