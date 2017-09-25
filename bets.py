@@ -5,12 +5,22 @@ import random
 import re
 
 from Settings_bets import BET_CHECK_FREQUENCY, BET_HOUSE_TAKE
-from Users import UserPoints
+# from Users import UserPoints
 
 # only addpoll and end bet insance should send messages via bot
 
 class betManager(): #always static
 	lastTimeRun = 0
+
+	def castBet(_bettingUser, _betOption ,_stakeAmount):
+		#does ths option exist in any bet?
+		for bet in module_share.all_bets:
+			for option in bet.optionsArray:
+				if _betOption.lower() == option.lower():
+					# this option exists
+					bet.optionsArray[option][_bettingUser.lower()] = int(_stakeAmount)
+					return True
+		return False
 
 	def betsChecker():
 		tnow = time.time()
@@ -34,7 +44,7 @@ class betManager(): #always static
 		newTotalPool = totalPool-houseCut
 
 		# calculate the payout rate with newTotalPool/winningoptiontotal
-		payoutRate = round(newTotalPool/optionPool[_winnerStr],2) # like 1.25
+		payoutRate = round(newTotalPool/optionPool[_winnerStr],2) # like 1.25 ie. this would be a 25% return
 
 		# calculate how much each winning better gets relative to their stake
 		totalPaidOut = 0
@@ -52,7 +62,18 @@ class betManager(): #always static
 			module_share.all_bets.append(_betObj)
 			module_share.botObject.sendMessage(_betObj.returnQuestionString())
 			module_share.botObject.sendMessage(_betObj.returnVoteInstructions())
-		return True
+			return _betObj.confCode
+
+	def betCancel(_confCode):
+		for bet in module_share.all_bets:
+			if bet.confCode == _confCode:
+				module_share.all_bets.remove(bet)
+				return True
+		return False
+
+	def betStatus(_confCode):
+		# show current bet totals per option, and calculate rate like:
+		# red:450(4/1) blue:100(2/1)
 
 class bet():
 
@@ -66,9 +87,19 @@ class bet():
 		N = 6
 		self.confCode = ''.join(random.choices(string.ascii_uppercase, k=N))
 
+	# this shows the command string for admins
+	def returnCommandString(self):
+		returnString = "\"!betcancel "+self.confCode+"\" to cancel bet. "
+		returnString+= "\"!betend "+self.confCode+"\" to end bet early. "
+		returnString+= "\"!betstatus "+self.confCode+"\" to see current bet amounts. "
+		return returnString
+
 	# this is the Q sent to the chat
 	def returnQuestionString(self):
-		return self._questionString
+		returnString = self._questionString
+		optionsString = ", ".join(self.optionsArray)
+		returnString+= " "+optionsString
+		return returnString
 
 	# this is the line that explains how to vote
 	def returnVoteInstructions(self):
@@ -76,7 +107,7 @@ class bet():
 			anOption = option
 			break
 		returnString = "to place a bet type !stake followed by an option, and the number of points you are staking. eg: \"!stake "+anOption+" 140\""
-		return True
+		return returnString
 
 	def sendResultString(self, _calculatedArr, _winnerStr):
 		responseString = _winnerStr+" is the winner. Congrats. Paying out "+str(_calculatedArr[1])+" at rate of "+str(_calculatedArr[2])
@@ -93,7 +124,7 @@ class bet():
 	def end(self, _endingUser, _winningOption):
 		payoutsArr = betManager.calcPayout(self.optionsArray, _winningOption)
 		self.sendResultString(payoutsArr, _winningOption)
-		UserPoints.betPayout(payoutsArr)
+		module_share.UserPoints.betPayout(payoutsArr)
 		return True
 
 

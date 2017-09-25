@@ -1,4 +1,41 @@
 
+s = "!stake red team 150"
+amount = s.rsplit(" ",1)[1]
+
+if not amount.isdigit():
+	print("not digit")
+
+option = s.split(" ",1)[1]
+option = option.rsplit(" ",1)[0]
+
+print(amount)
+print(option)
+
+
+# from bets import betManager, bet
+# import module_share
+
+# module_share.all_bets = []
+
+# class botObject():
+
+# 	def sendMessage(self, _msg):
+# 		print("< "+_msg);
+# 		return True
+
+# module_share.botObject = botObject()
+
+
+
+# thisBet = bet("gavTest", "who will win", ["red", "blue", "orange"]) # _creatingUser, _questionString, _optionsArray 
+# betManager.addBet(thisBet)
+
+
+
+# for bet in module_share.all_bets:
+# 	print(bet)
+
+# print("end")
 
 # houseTake = 0.05 # 5%
 

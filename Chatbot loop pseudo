@@ -1,11 +1,21 @@
 Last thing I was doing:
-- started on bets
-- add make bet command
-- add add stake command
-- add admin commands for the bet (cancel, end, check status)
+(did the manual commands for creating, ending, and making a stake on a bet)
+- add admin commands for the bet:
+X -- !betcancel CODE deletes the bet
+-- !betstatus CODE shows current bet amounts
+- uh oh, allow multiple bets per person?
+
+-- !betend CODE
+cancel, end, check status)
+IMPORTANT:
+- check bad inputs don't crash the bot
 - check multi-word poll/bet options can be voted on
 - poll and bet creation to have confirmation commands, not instant creation
 
+
+/w gavin_test_bot !bet Who will win? [Red team, Orange Team, Blue]
+
+!stake red team 20
 
 /w gavin_test_bot !poll Best colour? [red, blue, orange] 50
 

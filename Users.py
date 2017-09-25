@@ -10,6 +10,7 @@ from Read import getUser
 from Settings import HELP_STRING, IDENT, USER_STARTING_POINTS, CHANNEL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
 from Settings_points import POINTS_AK_ADD, POINTS_AK_PERIOD, POINTS_NAME_PLURAL, POINTS_NAME, POINTS_BAD_FORMAT, POINTS_GIFT_SELF, POINTS_NOT_ENOUGH, POINTS_CONFIRM, POINTS_BOT_RESPONSE, POINTS_USE, POINTS_USED, POINT_USED
 from polls import poll, pollManager, addPoll
+from bets import bet, betManager
 
 class UserPoints():
 
@@ -149,6 +150,46 @@ class Users(): # ALWAYS CALL STATICALLY
 
 								# ^^^^^ MANAGE PENDING ADMIN COMMANDS HERE ^^^^^!
 				# check for confirmations of pending commands END
+
+
+				
+				# !bet This is the question? [these, are the, options]
+				if userMessageStarts(_msg, "!bet "):
+					# get the brackets string
+					openIndex = last.find("[")
+					closeIndex = last.find("]")
+					justOptions = last[openIndex+1:closeIndex]
+					optionsArr = justOptions.split(",")
+					cleanOptions = []				
+					for option in optionsArr:
+						cleanOptions.append(option.strip()) # cleanOptions is now an array of the options 
+
+					# get the quesstion (everything between the !bet command and the opening options bracket)
+					justQuestion = last[5:openIndex].strip() # justQuestion is now a string of the bet question
+
+					# create bet
+					newBet = bet(thisUser, justQuestion, cleanOptions)
+
+					# add bet to list
+					confCode = betManager.addBet(newBet)
+					if confCode is not False:
+						module_share.botObject.sendWhisper(newBet.returnCommandString(), thisUser)
+					return True
+				# !bet This is the question? [these, are the, options] END
+
+
+				# !betcancel CODE
+				if userMessageStarts(_msg, "!betcancel "):
+					if len(last.split(" "))!=2:
+						return False
+					codePart = last.split(" ")[1]
+					if betManager.betCancel(codePart):
+						module_share.botObject.sendWhisper("bet was cancelled, consider notifying chat", thisUser)
+					else:
+						module_share.botObject.sendWhisper("bet could not be cancelled", thisUser)
+				# !betcancel CODE END
+
+
 
 
 				# !pollcancel [poll conf code]
@@ -322,6 +363,28 @@ class Users(): # ALWAYS CALL STATICALLY
 			thisUser = middle.split("!")[0]
 
 			logMessage(_msg)
+
+
+			# user staked a bet like: !stake option name here 140
+			if userMessageStarts(_msg, "!stake "):
+				amount = last.rsplit(" ",1)[1]
+				if not amount.isdigit():
+					return True
+				option = last.split(" ",1)[1]
+				option = option.rsplit(" ",1)[0]
+
+				# does user have this much to stake
+				thisUsersPoints = Users.userList[thisUser].points
+				if thisUsersPoints < int(amount):
+					module_share.botObject.sendWhisper("You can't stake "+str(amount)+", you only have "+str(thisUsersPoints)+" "+POINTS_NAME_PLURAL, thisUser)
+
+				# stake this amount
+				if betManager.castBet(thisUser, option ,amount):
+					# bet was cast, take off these points
+					UserPoints.subtract(Users.userList[thisUser], int(amount))
+					module_share.botObject.sendWhisper("You have staked "+str(amount)+" "+POINTS_NAME_PLURAL+" on "+option, thisUser)
+				else:
+					return True
 
 			# user voted in poll
 			if userMessageStarts(_msg, "!vote "):

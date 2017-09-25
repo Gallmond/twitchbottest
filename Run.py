@@ -9,6 +9,7 @@ from Read import getUser, getMessage, pingPong
 from Socket import botSocket
 from Users import Users, UserPoints
 from polls import pollManager
+from bets import betManager
 
 # listening functions should return true if they are to break the loop
 listeningFunctions = [] # this reacts to incoming lines
@@ -18,9 +19,11 @@ backgroundFunctions = [] # this just does stuff on timers
 Users.customInit()
 module_share.pending_commands = {}
 module_share.all_polls = []
+module_share.all_bets = []
 
 botObject = botSocket()
 module_share.botObject = botObject
+module_share.UserPoints = UserPoints
 
 listeningFunctions.append(pingPong) # prevent timeouts
 listeningFunctions.append(Users.UserListener) # listen for user based updates
