@@ -190,6 +190,26 @@ class Users(): # ALWAYS CALL STATICALLY
 				# !betcancel CODE END
 
 
+				# !betstatus CODE
+				if userMessageStarts(_msg, "!betstatus "):
+					if len(last.split(" "))!=2:
+						return False
+					codePart = last.split(" ")[1]
+					statusString = betManager.betStatus(codePart)
+					module_share.botObject.sendWhisper(statusString, thisUser)
+				# !betstatus CODE END
+
+
+				# !betend CODE
+				if userMessageStarts(_msg, "!betend "):
+					if len(last.split(" "))!=2:
+						return False
+					codePart = last.split(" ")[1]
+					betManager.endBet(codePart)
+					return True
+				# !betend CODE ENd
+
+
 
 
 				# !pollcancel [poll conf code]

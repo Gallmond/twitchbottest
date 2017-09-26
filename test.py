@@ -1,15 +1,9 @@
+b = {'orange': {'stakes': 0, 'total': 0, 'payoutrate': 0}}
 
-s = "!stake red team 150"
-amount = s.rsplit(" ",1)[1]
+print(b["orange"])
 
-if not amount.isdigit():
-	print("not digit")
 
-option = s.split(" ",1)[1]
-option = option.rsplit(" ",1)[0]
-
-print(amount)
-print(option)
+#s = print "Let's talk about %s." % my_name
 
 
 # from bets import betManager, bet

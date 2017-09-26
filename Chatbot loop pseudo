@@ -1,8 +1,10 @@
 Last thing I was doing:
-(did the manual commands for creating, ending, and making a stake on a bet)
-- add admin commands for the bet:
+-- continue on the !betend command. You forgot it needs to have a winning option passed in
+
+- add admin commands for the bot:
 X -- !betcancel CODE deletes the bet
--- !betstatus CODE shows current bet amounts
+x -- !betstatus CODE shows current bet amounts
+-- !betend CODE closes bet and pays out
 - uh oh, allow multiple bets per person?
 
 -- !betend CODE

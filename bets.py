@@ -29,6 +29,29 @@ class betManager(): #always static
 				if betObj.created+betObj.timeoutSeconds < tnow:
 					betObj.end()
 
+	def calcAllPayouts(_betDict): # this calculates payout rates and totals for all current bets in dict
+		# total pool, and pools per option
+		totalPool = 0
+		optionsPools = {}
+		for option in _betDict:
+			optionsPools[option] = {"stakes":0,"total":0,"payoutrate":0}
+			for better in _betDict[option]:
+				totalPool+= _betDict[option][better]
+				optionsPools[option]["total"]+= _betDict[option][better]
+				optionsPools[option]["stakes"]+= 1
+
+		# total pool sans house cut
+		houseCut = round(totalPool*BET_HOUSE_TAKE)
+		newTotalPool = totalPool-houseCut
+
+		# calculate payout rate for each option
+		for option in optionsPools:
+			# skip maths if 0 stakes
+			if optionsPools[option]["total"] != 0:
+				optionsPools[option]["payoutrate"] = round(newTotalPool/optionsPools[option]["total"],2)
+
+		return {"totalpool":totalPool, "options":optionsPools}
+
 	def calcPayout(_betDict, _winnerStr):
 		# get the total pool, and a dict of the totals for each option
 		totalPool = 0
@@ -74,6 +97,26 @@ class betManager(): #always static
 	def betStatus(_confCode):
 		# show current bet totals per option, and calculate rate like:
 		# red:450(4/1) blue:100(2/1)
+		returnString = ""
+		for bet in module_share.all_bets:
+			if _confCode == bet.confCode:
+				infoDict = betManager.calcAllPayouts(bet.optionsArray)
+				returnString += "Total staked:%s in " % infoDict["totalpool"]
+				optionStringArr = []
+				for option in infoDict["options"]:
+					thisOptionString = "%s:%s(%s betters with rate %s)" % (option, infoDict["options"][option]["total"], infoDict["options"][option]["stakes"] ,infoDict["options"][option]["payoutrate"])
+					optionStringArr.append(thisOptionString)
+				returnString+= " ".join(optionStringArr)
+		if returnString=="":
+			returnString = "no such bet."
+		return returnString
+
+	def endBet(_confCode, _winnerStr):
+		for bet in module_share.all_bets:
+			if bet.confCode == _confCode:
+				bet.end(None, _winnerStr)
+				return True
+		return False
 
 class bet():
 
@@ -126,8 +169,3 @@ class bet():
 		self.sendResultString(payoutsArr, _winningOption)
 		module_share.UserPoints.betPayout(payoutsArr)
 		return True
-
-
-
-
-
