@@ -1,18 +1,22 @@
 Last thing I was doing:
--- continue on the !betend command. You forgot it needs to have a winning option passed in
+- finished bets and moved bet and poll creation into pending commands
+- added looping for messages over X chars
 
-- add admin commands for the bot:
-X -- !betcancel CODE deletes the bet
-x -- !betstatus CODE shows current bet amounts
--- !betend CODE closes bet and pays out
-- uh oh, allow multiple bets per person?
-
--- !betend CODE
-cancel, end, check status)
 IMPORTANT:
 - check bad inputs don't crash the bot
-- check multi-word poll/bet options can be voted on
-- poll and bet creation to have confirmation commands, not instant creation
+eg:
+very long strings
+strings with odd characters
+missing inputs on commands
+
+in:
+using/giving/checking points
+creating bets
+staking
+creating polls
+voting in polls
+
+
 
 
 /w gavin_test_bot !bet Who will win? [Red team, Orange Team, Blue]

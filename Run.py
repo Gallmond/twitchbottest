@@ -63,10 +63,13 @@ while True:
 	for line in temp:
 		message = ""
 		print("> " + str(line))
+		if len(line)>500:
+			print("TRUNCATED")
+		
 
 		# do listening to incoming	
 		for f in listeningFunctions:			
-			if f(line):			
+			if f(line[:500]):			
 				print("breaking loop")			
 				break
 

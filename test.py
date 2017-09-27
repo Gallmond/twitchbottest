@@ -1,6 +1,38 @@
-b = {'orange': {'stakes': 0, 'total': 0, 'payoutrate': 0}}
+lip = "Lorem ipsum dolor sit amet, ius ex lorem minim adipisci, ex mei melius timeam postulant. In dicat nostro incorrupte vel. Eum at utroque sadipscing, id vitae numquam partiendo sed. Eu pri apeirian rationibus. Vim ad stet consetetur, nec ne justo intellegat appellantur. Sit ex ocurreret iracundia, sit esse nulla intellegam ea. Cum alii delenit neglegentur in, error nonumy vocent cu quo, sale persecuti his an. Dicant fastidii referrentur at est, purto adhuc meliore vix cu. Et eam libris electram consequuntur, est graecis corpora ea. Labore dissentiet ei pri."
+# 561 char
 
-print(b["orange"])
+t = "   www  ew    "
+t = t.strip()
+print("zz"+t+"zz")
+
+splitSize = 496
+splitSize = 50
+
+print(lip[0:5])
+
+def coolPrinter(_msg):
+	print("> "+_msg)
+	return True
+
+
+def coolPrinter2(_msg):
+	if len(_msg)>500:
+		splitMessage = [_msg[i:i+splitSize] for i in range(0, len(_msg), splitSize)]
+
+		for i in range(0,len(splitMessage)):
+			thisStr = ""
+			if i == 0:
+				print("> "+splitMessage[i].strip()+"--")
+			elif i == len(splitMessage)-1:
+				print("> --"+splitMessage[i].strip())
+			else:
+				print("> --"+splitMessage[i].strip()+"--")
+
+
+print(range(0,1,9))
+
+coolPrinter(lip)
+coolPrinter2(lip)
 
 
 #s = print "Let's talk about %s." % my_name

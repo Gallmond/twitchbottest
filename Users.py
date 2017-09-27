@@ -146,13 +146,34 @@ class Users(): # ALWAYS CALL STATICALLY
 										sys.exit()
 									else:
 										module_share.botObject.sendWhisper("couldn't save userlist.", thisUser)
+								# type kill end
+
+								if command["type"] == "create_poll": #  {"question":justQuestion, "cleanoptions":cleanOptions, "timer":int(timeString)}
+									# construct poll
+									newPoll = poll(command["params"]["question"], command["params"]["cleanoptions"], command["params"]["timer"])
+									addPoll(newPoll)
+									
+									# message mod with commandlist
+									module_share.botObject.sendWhisper(newPoll.returnCommandString(), thisUser)
+									return True
+								# type create_poll end
+
+								if command["type"] == "create_bet": # {"thisuser":thisUser, "cleanoptions":cleanOptions, "question":justQuestion}
+									# create bet
+									newBet = bet(command["params"]["thisuser"], command["params"]["question"], command["params"]["cleanoptions"])
+
+									# add bet to list
+									confCode = betManager.addBet(newBet)
+									if confCode is not False:
+										module_share.botObject.sendWhisper(newBet.returnCommandString(), thisUser)
+									return True
+								# type create_bet end
 
 
 								# ^^^^^ MANAGE PENDING ADMIN COMMANDS HERE ^^^^^!
 				# check for confirmations of pending commands END
 
 
-				
 				# !bet This is the question? [these, are the, options]
 				if userMessageStarts(_msg, "!bet "):
 					# get the brackets string
@@ -167,13 +188,11 @@ class Users(): # ALWAYS CALL STATICALLY
 					# get the quesstion (everything between the !bet command and the opening options bracket)
 					justQuestion = last[5:openIndex].strip() # justQuestion is now a string of the bet question
 
-					# create bet
-					newBet = bet(thisUser, justQuestion, cleanOptions)
-
-					# add bet to list
-					confCode = betManager.addBet(newBet)
-					if confCode is not False:
-						module_share.botObject.sendWhisper(newBet.returnCommandString(), thisUser)
+					# create pending command
+					paramDict = {"thisuser":thisUser, "cleanoptions":cleanOptions, "question":justQuestion}
+					thisCommand = addPendingCommand(thisUser, "create_bet", paramDict)
+					confString = "reply \"!confirm "+thisCommand["confcode"]+"\" to create the bet"
+					module_share.botObject.sendWhisper(confString, thisUser)
 					return True
 				# !bet This is the question? [these, are the, options] END
 
@@ -200,16 +219,15 @@ class Users(): # ALWAYS CALL STATICALLY
 				# !betstatus CODE END
 
 
-				# !betend CODE
+				# !betend CODE winner
 				if userMessageStarts(_msg, "!betend "):
-					if len(last.split(" "))!=2:
+					if len(last.split(" ", 2))!=3:
 						return False
-					codePart = last.split(" ")[1]
-					betManager.endBet(codePart)
+					codePart = last.split(" ", 2)[1]
+					winnerString = last.split(" ", 2)[2]
+					betManager.endBet(codePart, winnerString)
 					return True
-				# !betend CODE ENd
-
-
+				# !betend CODE winner END
 
 
 				# !pollcancel [poll conf code]
@@ -222,6 +240,7 @@ class Users(): # ALWAYS CALL STATICALLY
 					else:
 						module_share.botObject.sendWhisper("couldn't cancel poll", thisUser)
 				# !pollcancel [poll conf code] END
+
 
 				# !pollstatus [poll conf code]
 				if userMessageStarts(_msg, "!pollstatus "):
@@ -267,14 +286,15 @@ class Users(): # ALWAYS CALL STATICALLY
 					lastSpace = last.rfind(" ")
 					timeString = last[lastSpace+1:]
 
-					# construct poll
-					newPoll = poll(justQuestion, cleanOptions, int(timeString))
-					addPoll(newPoll)
-					
-					# message mod with commandlist
-					module_share.botObject.sendWhisper(newPoll.returnCommandString(), thisUser)
+					# create pending command
+					paramDict = {"question":justQuestion, "cleanoptions":cleanOptions, "timer":int(timeString)}
+					thisCommand = addPendingCommand(thisUser, "create_poll", paramDict)
+					confString = "reply \"!confirm "+thisCommand["confcode"]+"\" to create the poll"
+					module_share.botObject.sendWhisper(confString, thisUser)
 					return True
 				# poll creation command END
+
+
 
 
 				# !killbot to gracefully kill the bot
@@ -347,6 +367,7 @@ class Users(): # ALWAYS CALL STATICALLY
 					return True;
 				# !allpoints end
 
+
 				# !setpoints username number
 				if userMessageStarts(_msg, "!setpoints"):
 					if len(last.split(" ")) != 3:
@@ -404,7 +425,9 @@ class Users(): # ALWAYS CALL STATICALLY
 					UserPoints.subtract(Users.userList[thisUser], int(amount))
 					module_share.botObject.sendWhisper("You have staked "+str(amount)+" "+POINTS_NAME_PLURAL+" on "+option, thisUser)
 				else:
+					module_share.botObject.sendWhisper("Could not stake (have you already bet on this option?)")
 					return True
+
 
 			# user voted in poll
 			if userMessageStarts(_msg, "!vote "):
@@ -559,9 +582,6 @@ class Users(): # ALWAYS CALL STATICALLY
 
 		# ========= MESSAGES FROM CHAT END
 
-
-
-		
 
 
 		# check for userlist building

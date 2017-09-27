@@ -1,5 +1,5 @@
 import socket
-from Settings import HOST, PORT, PASS, IDENT, CHANNEL
+from Settings import HOST, PORT, PASS, IDENT, CHANNEL, MESSAGE_SPLIT_SIZE, MESSAGE_SPLIT_MARKER
 from Users import Users
 # from Helpers import throttler
 
@@ -56,15 +56,51 @@ class botSocket():
 		return True
 
 	def sendMessage(self, _msg): # send message to channel
-		messageTemp = "PRIVMSG #" + CHANNEL + " :" + _msg
-		self.send(messageTemp)
-		return True
+		# split this up if over 500 chars
+		if len(_msg)>(MESSAGE_SPLIT_SIZE-MESSAGE_SPLIT_MARKER):
+			splitMessage = [_msg[i:i+(MESSAGE_SPLIT_SIZE-MESSAGE_SPLIT_MARKER)] for i in range(0, len(_msg), (MESSAGE_SPLIT_SIZE-MESSAGE_SPLIT_MARKER))]
+
+			for i in range(0,len(splitMessage)):
+				thisStr = ""
+				if i == 0:
+					thisStr = splitMessage[i].strip()+"--"
+				elif i == len(splitMessage)-1:
+					thisStr = "--"+splitMessage[i].strip()
+				else:
+					thisStr = "--"+splitMessage[i].strip()+"--"
+
+				messageTemp = "PRIVMSG #" + CHANNEL + " :" + thisStr
+				self.send(messageTemp)
+				return True
+
+		else:
+			messageTemp = "PRIVMSG #" + CHANNEL + " :" + _msg
+			self.send(messageTemp)
+			return True
 
 	def sendWhisper(self, _msg, _username): # send whisper
-		messageTemp = "PRIVMSG #" + CHANNEL + " :/w "+_username+" "+_msg
-		self.send(messageTemp)
-		print("Whispered: " + messageTemp)
-		return True
+		# split this up if over 500 chars
+		if len(_msg)>(MESSAGE_SPLIT_SIZE-MESSAGE_SPLIT_MARKER):
+			splitMessage = [_msg[i:i+(MESSAGE_SPLIT_SIZE-MESSAGE_SPLIT_MARKER)] for i in range(0, len(_msg), (MESSAGE_SPLIT_SIZE-MESSAGE_SPLIT_MARKER))]
+
+			for i in range(0,len(splitMessage)):
+				thisStr = ""
+				if i == 0:
+					thisStr = splitMessage[i].strip()+"--"
+				elif i == len(splitMessage)-1:
+					thisStr = "--"+splitMessage[i].strip()
+				else:
+					thisStr = "--"+splitMessage[i].strip()+"--"
+					
+				messageTemp = "PRIVMSG #" + CHANNEL + " :/w "+_username+" "+thisStr
+				self.send(messageTemp)
+				return True
+
+		else:
+			messageTemp = "PRIVMSG #" + CHANNEL + " :/w "+_username+" "+_msg
+			self.send(messageTemp)
+			print("Whispered: " + messageTemp)
+			return True
 
 	def send(self, _msg): # print then send directly to socket
 		print("< "+str(_msg))

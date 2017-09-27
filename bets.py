@@ -12,10 +12,12 @@ from Settings_bets import BET_CHECK_FREQUENCY, BET_HOUSE_TAKE
 class betManager(): #always static
 	lastTimeRun = 0
 
-	def castBet(_bettingUser, _betOption ,_stakeAmount):
+	def castBet(_bettingUser, _betOption ,_stakeAmount): # better can bet on each option, but only once per option
 		#does ths option exist in any bet?
 		for bet in module_share.all_bets:
 			for option in bet.optionsArray:
+				if _bettingUser.lower() in bet.optionsArray[option]:
+					return False
 				if _betOption.lower() == option.lower():
 					# this option exists
 					bet.optionsArray[option][_bettingUser.lower()] = int(_stakeAmount)
@@ -54,6 +56,7 @@ class betManager(): #always static
 
 	def calcPayout(_betDict, _winnerStr):
 		# get the total pool, and a dict of the totals for each option
+		_winnerStr = _winnerStr.lower()
 		totalPool = 0
 		optionPool = {}
 		for option in _betDict:
@@ -125,6 +128,7 @@ class bet():
 		self._questionString = _questionString
 		self.optionsArray = {}
 		for i in _optionsArray:
+			i = i.lower()
 			self.optionsArray[i] = {} 
 
 		N = 6
@@ -133,7 +137,7 @@ class bet():
 	# this shows the command string for admins
 	def returnCommandString(self):
 		returnString = "\"!betcancel "+self.confCode+"\" to cancel bet. "
-		returnString+= "\"!betend "+self.confCode+"\" to end bet early. "
+		returnString+= "\"!betend "+self.confCode+" winningoption\" to end the bet. "
 		returnString+= "\"!betstatus "+self.confCode+"\" to see current bet amounts. "
 		return returnString
 
@@ -168,4 +172,5 @@ class bet():
 		payoutsArr = betManager.calcPayout(self.optionsArray, _winningOption)
 		self.sendResultString(payoutsArr, _winningOption)
 		module_share.UserPoints.betPayout(payoutsArr)
+		module_share.all_bets.remove(self)
 		return True
