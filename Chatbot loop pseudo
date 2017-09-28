@@ -1,9 +1,9 @@
 Last thing I was doing:
-- add more to !help command
+- draft use guide for v1
 - clean up settings files
-- make a use guide for V1
+- second draft use guide
 
-
+- Add a time limit on abandoned bets
 
 /w gavin_test_bot !bet Who will win? [Red team, Orange Team, Blue]
 /w gavin_test_bot !bet Who will win? [الحُرُوف, Orange Team, Blue]

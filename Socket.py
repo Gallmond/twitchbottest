@@ -1,5 +1,6 @@
 import socket
-from Settings import HOST, PORT, PASS, IDENT, CHANNEL, MESSAGE_SPLIT_SIZE, MESSAGE_SPLIT_MARKER
+from Settings import CHANNEL, MESSAGE_SPLIT_SIZE, MESSAGE_SPLIT_MARKER
+from Settings_auth import HOST, PORT, PASS, IDENT
 from Users import Users
 # from Helpers import throttler
 

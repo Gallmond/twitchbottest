@@ -7,7 +7,8 @@ import random
 import sys
 
 from Read import getUser
-from Settings import ADMIN_HELP_STRING, HELP_STRING, IDENT, USER_STARTING_POINTS, CHANNEL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
+from Settings import ADMIN_HELP_STRING, HELP_STRING, USER_STARTING_POINTS, CHANNEL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
+from Settings_auth import IDENT
 from Settings_points import POINTS_AK_ADD, POINTS_AK_PERIOD, POINTS_NAME_PLURAL, POINTS_NAME, POINTS_BAD_FORMAT, POINTS_GIFT_SELF, POINTS_NOT_ENOUGH, POINTS_CONFIRM, POINTS_BOT_RESPONSE, POINTS_USE, POINTS_USED, POINT_USED
 from polls import poll, pollManager, addPoll
 from bets import bet, betManager
@@ -521,8 +522,8 @@ class Users(): # ALWAYS CALL STATICALLY
 
 				return True
 			
-			# user typed !give username X
-			if userMessageStarts(_msg, "!give"): 
+			# user typed !give username X eccies
+			if userMessageStarts(_msg, "!give "): 
 				tempmsg = _msg.replace("\r\n","")
 				if tempmsg.find(POINTS_NAME_PLURAL) == len(tempmsg)-len(POINTS_NAME_PLURAL) or tempmsg.find("1 "+POINTS_NAME) == len(tempmsg)-len("1 "+POINTS_NAME): # message ends with the plural name
 					thisUserObject = Users.userList[thisUser]

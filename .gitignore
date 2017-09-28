@@ -1,5 +1,6 @@
 __pycache__/
-Settings.py
+Settings_auth.py
+python-3.6.2.exe
 *.sublime-*
 *DS_Store*
 *gavgit*
