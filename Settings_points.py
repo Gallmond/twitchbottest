@@ -1,18 +1,18 @@
 # loyalty point settings
-POINTS_NAME = "eccie"
-POINTS_NAME_PLURAL = "eccies" # user types !POINTS_NAME_PLURAL for bot to tell them how many they have
+POINTS_NAME = "quid"
+POINTS_NAME_PLURAL = "quids" # user types !POINTS_NAME_PLURAL for bot to tell them how many they have
 POINTS_AK_ADD = 1 # how many points are earned just by being in chat
 POINTS_AK_PERIOD = 20 # how many seconds apart the above is added
 
 # points use
-POINTS_USE = "dunt" # user types !POINTS_USER with optional number
+POINTS_USE = "drop" # user types !POINTS_USER with optional number
 
 # response strings.
 # the parts {like this} are replaced automatically. They don't need to be there though.
 
 # using
-POINTS_USED = "{username} dunted {amountuserd} "+POINTS_NAME_PLURAL+" ooft"
-POINT_USED = "{username} dunted an "+POINTS_NAME
+POINTS_USED = "{username} drop {amountuserd} "+POINTS_NAME_PLURAL+" ooft"
+POINT_USED = "{username} drop an "+POINTS_NAME
 
 # giving and recieving
 POINTS_BAD_FORMAT = "bad format !give request"

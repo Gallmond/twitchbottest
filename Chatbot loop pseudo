@@ -1,25 +1,14 @@
 Last thing I was doing:
-- finished bets and moved bet and poll creation into pending commands
-- added looping for messages over X chars
-
-IMPORTANT:
-- check bad inputs don't crash the bot
-eg:
-very long strings
-strings with odd characters
-missing inputs on commands
-
-in:
-using/giving/checking points
-creating bets
-staking
-creating polls
-voting in polls
-
+- add more to !help command
+- clean up settings files
+- make a use guide for V1
 
 
 
 /w gavin_test_bot !bet Who will win? [Red team, Orange Team, Blue]
+/w gavin_test_bot !bet Who will win? [الحُرُوف, Orange Team, Blue]
+
+
 
 !stake red team 20
 

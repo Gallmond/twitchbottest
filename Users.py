@@ -7,7 +7,7 @@ import random
 import sys
 
 from Read import getUser
-from Settings import HELP_STRING, IDENT, USER_STARTING_POINTS, CHANNEL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
+from Settings import ADMIN_HELP_STRING, HELP_STRING, IDENT, USER_STARTING_POINTS, CHANNEL, USER_AFK_TIMER, USER_MESSAGES_STORED, FILE_SAVE_PERIOD
 from Settings_points import POINTS_AK_ADD, POINTS_AK_PERIOD, POINTS_NAME_PLURAL, POINTS_NAME, POINTS_BAD_FORMAT, POINTS_GIFT_SELF, POINTS_NOT_ENOUGH, POINTS_CONFIRM, POINTS_BOT_RESPONSE, POINTS_USE, POINTS_USED, POINT_USED
 from polls import poll, pollManager, addPoll
 from bets import bet, betManager
@@ -108,6 +108,12 @@ class Users(): # ALWAYS CALL STATICALLY
 			thisUser = middle.split("!")[0]
 			if Users.userList[thisUser].opstatus == "+o":
 				# ADMIN LISTENING HERE
+
+
+				if userMessageStarts(_msg, "!modhelp"):
+					if len(last)!=len("!modhelp"):
+						return True
+					module_share.botObject.sendWhisper(ADMIN_HELP_STRING, thisUser)
 
 
 				# check for confirmations of pending commands
@@ -293,8 +299,6 @@ class Users(): # ALWAYS CALL STATICALLY
 					module_share.botObject.sendWhisper(confString, thisUser)
 					return True
 				# poll creation command END
-
-
 
 
 				# !killbot to gracefully kill the bot
@@ -711,6 +715,11 @@ def logMessage(_msg):
 		last = ""
 	# log this users message
 	thisUser = middle.split("!")[0] 
+
+	# user doesn't exist
+	if thisUser not in Users.userList:
+		Users.addNewUser(userName)
+
 	Users.userList[thisUser].messages.insert(0,[time.time(), _msg])
 	if len(Users.userList[thisUser].messages) > USER_MESSAGES_STORED:
 		Users.userList[thisUser].messages.pop()

@@ -16,4 +16,4 @@ class fileManager():
 					if int(c["time"]) < time.time()-int(COMMAND_CLEAR_TIMER):
 						print("deleting command:")
 						print(c)
-						module_share.pending_commands[u].pop(c)
+						module_share.pending_commands[u].remove(c)

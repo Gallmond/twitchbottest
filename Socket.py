@@ -57,8 +57,8 @@ class botSocket():
 
 	def sendMessage(self, _msg): # send message to channel
 		# split this up if over 500 chars
-		if len(_msg)>(MESSAGE_SPLIT_SIZE-MESSAGE_SPLIT_MARKER):
-			splitMessage = [_msg[i:i+(MESSAGE_SPLIT_SIZE-MESSAGE_SPLIT_MARKER)] for i in range(0, len(_msg), (MESSAGE_SPLIT_SIZE-MESSAGE_SPLIT_MARKER))]
+		if len(_msg)>(MESSAGE_SPLIT_SIZE-len(MESSAGE_SPLIT_MARKER)):
+			splitMessage = [_msg[i:i+(MESSAGE_SPLIT_SIZE-len(MESSAGE_SPLIT_MARKER))] for i in range(0, len(_msg), (MESSAGE_SPLIT_SIZE-len(MESSAGE_SPLIT_MARKER)))]
 
 			for i in range(0,len(splitMessage)):
 				thisStr = ""
@@ -71,7 +71,7 @@ class botSocket():
 
 				messageTemp = "PRIVMSG #" + CHANNEL + " :" + thisStr
 				self.send(messageTemp)
-				return True
+				# return True
 
 		else:
 			messageTemp = "PRIVMSG #" + CHANNEL + " :" + _msg
@@ -80,8 +80,8 @@ class botSocket():
 
 	def sendWhisper(self, _msg, _username): # send whisper
 		# split this up if over 500 chars
-		if len(_msg)>(MESSAGE_SPLIT_SIZE-MESSAGE_SPLIT_MARKER):
-			splitMessage = [_msg[i:i+(MESSAGE_SPLIT_SIZE-MESSAGE_SPLIT_MARKER)] for i in range(0, len(_msg), (MESSAGE_SPLIT_SIZE-MESSAGE_SPLIT_MARKER))]
+		if len(_msg)>(MESSAGE_SPLIT_SIZE-len(MESSAGE_SPLIT_MARKER)):
+			splitMessage = [_msg[i:i+(MESSAGE_SPLIT_SIZE-len(MESSAGE_SPLIT_MARKER))] for i in range(0, len(_msg), (MESSAGE_SPLIT_SIZE-len(MESSAGE_SPLIT_MARKER)))]
 
 			for i in range(0,len(splitMessage)):
 				thisStr = ""
@@ -94,7 +94,7 @@ class botSocket():
 					
 				messageTemp = "PRIVMSG #" + CHANNEL + " :/w "+_username+" "+thisStr
 				self.send(messageTemp)
-				return True
+				# return True
 
 		else:
 			messageTemp = "PRIVMSG #" + CHANNEL + " :/w "+_username+" "+_msg
