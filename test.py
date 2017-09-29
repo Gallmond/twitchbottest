@@ -1,21 +1,17 @@
-#
 
+s = "!bet who will win? [red team, blue team] 50"
+s = "!bet who will win? [red team, blue team]"
 
-ar = [
-    [1506624581.5388932, '@badges=;color=;display-name=RubMyBum;emotes=;message-id=331;thread-id=142411464_166478382;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv WHISPER gavin_test_bot :!killbot'],
-    [1506622710.2543905, '@badges=broadcaster/1;color=;display-name=RubMyBum;emotes=;id=217f45a7-4b2b-4401-82d2-ffa36ee6fca4;mod=0;room-id=142411464;sent-ts=1506622709963;subscriber=0;tmi-sent-ts=1506622711938;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv PRIVMSG #rubmybum :!quids'],
-    [1506622666.2002363, '@badges=broadcaster/1;color=;display-name=RubMyBum;emotes=;id=1b5f8b76-cb41-4efe-a265-60d8054b4e2d;mod=0;room-id=142411464;sent-ts=1506622665977;subscriber=0;tmi-sent-ts=1506622667908;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv PRIVMSG #rubmybum :!quid'],
-    [1506622659.1472442, '@badges=broadcaster/1;color=;display-name=RubMyBum;emotes=;id=77af237f-bd1d-4a14-9550-10e7a7566f59;mod=0;room-id=142411464;sent-ts=1506622658906;subscriber=0;tmi-sent-ts=1506622660856;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv PRIVMSG #rubmybum :hi bot'],
-    [1506621611.0532613, '@badges=;color=;display-name=RubMyBum;emotes=;message-id=327;thread-id=142411464_166478382;turbo=0;user-id=142411464;user-type= :rubmybum!rubmybum@rubmybum.tmi.twitch.tv WHISPER gavin_test_bot :!killbot'],
-]
+openindex = s.find("[")
+closeindex = s.find("]")
+remaining = s[closeindex+1:len(s)]
+cleanRemaining = remaining.strip()
 
-print(ar)
+print("["+remaining+"]")
+print("["+cleanRemaining+"]")
 
-for i in ar:
-	msplit = i[1].split(":",2)
-	print(msplit[2]) 
-
-
+if cleanRemaining == "":
+	print("IT IS")
 
 # lip = "Lorem ipsum dolor sit amet, ius ex lorem minim adipisci, ex mei melius timeam postulant. In dicat nostro incorrupte vel. Eum at utroque sadipscing, id vitae numquam partiendo sed. Eu pri apeirian rationibus. Vim ad stet consetetur, nec ne justo intellegat appellantur. Sit ex ocurreret iracundia, sit esse nulla intellegam ea. Cum alii delenit neglegentur in, error nonumy vocent cu quo, sale persecuti his an. Dicant fastidii referrentur at est, purto adhuc meliore vix cu. Et eam libris electram consequuntur, est graecis corpora ea. Labore dissentiet ei pri."
 # # 561 char

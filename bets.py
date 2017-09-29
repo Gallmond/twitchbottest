@@ -4,7 +4,7 @@ import string
 import random
 import re
 
-from Settings_bets import BET_CHECK_FREQUENCY, BET_HOUSE_TAKE
+from Settings_bets import BET_LOCK_FREQUENCY, BET_HOUSE_TAKE
 # from Users import UserPoints
 
 # only addpoll and end bet insance should send messages via bot
@@ -15,6 +15,8 @@ class betManager(): #always static
 	def castBet(_bettingUser, _betOption ,_stakeAmount): # better can bet on each option, but only once per option
 		#does ths option exist in any bet?
 		for bet in module_share.all_bets:
+			if bet.locked:
+				return False
 			for option in bet.optionsArray:
 				if _bettingUser.lower() in bet.optionsArray[option]:
 					return False
@@ -24,12 +26,25 @@ class betManager(): #always static
 					return True
 		return False
 
-	def betsChecker():
+	def betsLocker():
 		tnow = time.time()
-		if betManager.lastTimeRun < tnow - BET_CHECK_FREQUENCY:
+		if betManager.lastTimeRun < tnow - BET_LOCK_FREQUENCY:
 			for betObj in module_share.all_bets:
-				if betObj.created+betObj.timeoutSeconds < tnow:
-					betObj.end()
+				if betObj.timeoutSeconds != -1:
+					if betObj.created+betObj.timeoutSeconds < tnow:
+						betManager.lockBet(betObj)
+
+	def manualLockBet(_confCode):
+		for bet in module_share.all_bets:
+			if bet.confCode==_confCode:
+				return betManager.lockBet(bet)
+
+
+	def lockBet(_betObj):
+		if _betObj.lock():
+			return _betObj.returnLockedString();
+		else:
+			return False
 
 	def calcAllPayouts(_betDict): # this calculates payout rates and totals for all current bets in dict
 		# total pool, and pools per option
@@ -117,22 +132,51 @@ class betManager(): #always static
 	def endBet(_confCode, _winnerStr):
 		for bet in module_share.all_bets:
 			if bet.confCode == _confCode:
-				bet.end(None, _winnerStr)
-				return True
+				# does this bet even have this option?
+				if _winnerStr in bet.optionsArray:
+					bet.end(None, _winnerStr)
+					return True
 		return False
 
 class bet():
 
-	def __init__(self, _creatingUser, _questionString, _optionsArray):
+	def __init__(self, _creatingUser, _questionString, _optionsArray, _timeoutTime):
 		self.createdBy = _creatingUser
 		self._questionString = _questionString
 		self.optionsArray = {}
+		self.timeoutSeconds = _timeoutTime
+		self.locked = False
 		for i in _optionsArray:
 			i = i.lower()
 			self.optionsArray[i] = {} 
 
 		N = 6
 		self.confCode = ''.join(random.choices(string.ascii_uppercase, k=N))
+
+	# this prevents more bets being taken
+	def lock(self):
+		self.locked = True
+		return True;
+
+	def curTotal(self):
+		runningTotal = 0 
+		for option in self.optionsArray:
+			for better in self.optionsArray[option]:
+				runningTotal+= self.optionsArray[option][better]
+		return runningTotal
+
+	def returnLockedString(self):
+		betInfo = betManager.calcAllPayouts(self.optionsArray)
+		
+		optionsStringArr = []
+		for option in betInfo["options"]:
+			thisStr = option+" "+str(betInfo["options"][option]["total"])+"("+str(betInfo["options"][option]["payoutrate"])+")"
+			optionsStringArr.append(thisStr)
+
+		joinedStr = " ".join(optionsStringArr) 
+
+		returnString = "Betting closed. Total: "+str(betInfo["totalpool"])+" "+joinedStr
+		return returnString
 
 	# this shows the command string for admins
 	def returnCommandString(self):

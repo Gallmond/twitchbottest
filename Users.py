@@ -167,7 +167,7 @@ class Users(): # ALWAYS CALL STATICALLY
 
 								if command["type"] == "create_bet": # {"thisuser":thisUser, "cleanoptions":cleanOptions, "question":justQuestion}
 									# create bet
-									newBet = bet(command["params"]["thisuser"], command["params"]["question"], command["params"]["cleanoptions"])
+									newBet = bet(command["params"]["thisuser"], command["params"]["question"], command["params"]["cleanoptions"], command["params"]["timer"])
 
 									# add bet to list
 									confCode = betManager.addBet(newBet)
@@ -188,6 +188,13 @@ class Users(): # ALWAYS CALL STATICALLY
 					closeIndex = last.find("]")
 					justOptions = last[openIndex+1:closeIndex]
 					optionsArr = justOptions.split(",")
+					timer = last[closeIndex+1:len(last)]# all chars after closing ]
+					timer = timer.strip() # if this is an empty string, no timer was passed in
+					if timer == "":
+						timer = int(timer)
+					else:
+						timer = -1
+
 					cleanOptions = []				
 					for option in optionsArr:
 						cleanOptions.append(option.strip()) # cleanOptions is now an array of the options 
@@ -196,7 +203,7 @@ class Users(): # ALWAYS CALL STATICALLY
 					justQuestion = last[5:openIndex].strip() # justQuestion is now a string of the bet question
 
 					# create pending command
-					paramDict = {"thisuser":thisUser, "cleanoptions":cleanOptions, "question":justQuestion}
+					paramDict = {"thisuser":thisUser, "cleanoptions":cleanOptions, "question":justQuestion, "timer":timer}
 					thisCommand = addPendingCommand(thisUser, "create_bet", paramDict)
 					confString = "reply \"!confirm "+thisCommand["confcode"]+"\" to create the bet"
 					module_share.botObject.sendWhisper(confString, thisUser)
@@ -235,6 +242,18 @@ class Users(): # ALWAYS CALL STATICALLY
 					betManager.endBet(codePart, winnerString)
 					return True
 				# !betend CODE winner END
+
+
+				# !betlock CODE 
+				if userMessageStarts(_msg, "!betlock "):
+					if len(last.split(" "))!=2:
+						return False
+					codePart = last.split(" ")[1]
+					lockString = betManager.manualLockBet(codePart)
+					if lockString != False:
+						module_share.botObject.sendMessage(lockString)
+					return True
+				# !betlock CODE winner END
 
 
 				# !pollcancel [poll conf code]
@@ -430,7 +449,7 @@ class Users(): # ALWAYS CALL STATICALLY
 					UserPoints.subtract(Users.userList[thisUser], int(amount))
 					module_share.botObject.sendWhisper("You have staked "+str(amount)+" "+POINTS_NAME_PLURAL+" on "+option, thisUser)
 				else:
-					module_share.botObject.sendWhisper("Could not stake (have you already bet on this option?)")
+					module_share.botObject.sendWhisper("Could not stake (have you already bet on this option?)",thisUser)
 					return True
 
 
