@@ -1,17 +1,8 @@
 
-s = "!bet who will win? [red team, blue team] 50"
-s = "!bet who will win? [red team, blue team]"
-
-openindex = s.find("[")
-closeindex = s.find("]")
-remaining = s[closeindex+1:len(s)]
-cleanRemaining = remaining.strip()
-
-print("["+remaining+"]")
-print("["+cleanRemaining+"]")
-
-if cleanRemaining == "":
-	print("IT IS")
+if False:
+	print("HHHH")
+else:
+	print("RRRR")
 
 # lip = "Lorem ipsum dolor sit amet, ius ex lorem minim adipisci, ex mei melius timeam postulant. In dicat nostro incorrupte vel. Eum at utroque sadipscing, id vitae numquam partiendo sed. Eu pri apeirian rationibus. Vim ad stet consetetur, nec ne justo intellegat appellantur. Sit ex ocurreret iracundia, sit esse nulla intellegam ea. Cum alii delenit neglegentur in, error nonumy vocent cu quo, sale persecuti his an. Dicant fastidii referrentur at est, purto adhuc meliore vix cu. Et eam libris electram consequuntur, est graecis corpora ea. Labore dissentiet ei pri."
 # # 561 char

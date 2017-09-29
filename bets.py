@@ -10,6 +10,7 @@ from Settings_bets import BET_LOCK_FREQUENCY, BET_HOUSE_TAKE
 # only addpoll and end bet insance should send messages via bot
 
 class betManager(): #always static
+
 	lastTimeRun = 0
 
 	def castBet(_bettingUser, _betOption ,_stakeAmount): # better can bet on each option, but only once per option
@@ -27,22 +28,29 @@ class betManager(): #always static
 		return False
 
 	def betsLocker():
-		tnow = time.time()
-		if betManager.lastTimeRun < tnow - BET_LOCK_FREQUENCY:
+		
+		if betManager.lastTimeRun < time.time() - BET_LOCK_FREQUENCY:
+			print("checking for locks needed")
 			for betObj in module_share.all_bets:
-				if betObj.timeoutSeconds != -1:
-					if betObj.created+betObj.timeoutSeconds < tnow:
-						betManager.lockBet(betObj)
+				# not already locked?
+				if not betObj.locked:
+					print("timeoutSeconds: "+str(betObj.timeoutSeconds))
+					if betObj.timeoutSeconds != -1:
+						if betObj.created+betObj.timeoutSeconds < time.time():
+							print("locking bet")
+							betManager.lockBet(betObj)
+			betManager.lastTimeRun = time.time()
 
 	def manualLockBet(_confCode):
 		for bet in module_share.all_bets:
 			if bet.confCode==_confCode:
-				return betManager.lockBet(bet)
-
+				bet.lock()
+				return bet.returnLockedString()
 
 	def lockBet(_betObj):
-		if _betObj.lock():
-			return _betObj.returnLockedString();
+		res = _betObj.lock()
+		if res:
+			module_share.botObject.sendMessage(_betObj.returnLockedString()) 
 		else:
 			return False
 
@@ -85,7 +93,10 @@ class betManager(): #always static
 		newTotalPool = totalPool-houseCut
 
 		# calculate the payout rate with newTotalPool/winningoptiontotal
-		payoutRate = round(newTotalPool/optionPool[_winnerStr],2) # like 1.25 ie. this would be a 25% return
+		if optionPool[_winnerStr] <= 0:
+			payoutRate = 0.00
+		else:
+			payoutRate = round(newTotalPool/optionPool[_winnerStr],2) # like 1.25 ie. this would be a 25% return
 
 		# calculate how much each winning better gets relative to their stake
 		totalPaidOut = 0
@@ -144,6 +155,7 @@ class bet():
 		self.createdBy = _creatingUser
 		self._questionString = _questionString
 		self.optionsArray = {}
+		self.created = time.time()
 		self.timeoutSeconds = _timeoutTime
 		self.locked = False
 		for i in _optionsArray:

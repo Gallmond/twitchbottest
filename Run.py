@@ -32,6 +32,7 @@ backgroundFunctions.append(UserPoints.presencePoints) # this adds points for peo
 backgroundFunctions.append(Users.saveUserFile) # this adds points for people in the chat
 backgroundFunctions.append(fileManager.clearPendingCommands) # this adds points for people in the chat
 backgroundFunctions.append(pollManager.pollsChecker) # this checks for polls to end
+backgroundFunctions.append(betManager.betsLocker) # this checks for bets to end
 
 # request permissions
 botObject.requestPermissions()

@@ -1,20 +1,5 @@
 Last thing I was doing:
-- payouts on a winner nobody bet for causes a divide by zero crash!
-- add lock timeout for bets
-
-Traceback (most recent call last):
-  File "C:\Users\Gavin\Desktop\python\Run.py", line 72, in <module>
-    if f(line[:500]):
-  File "C:\Users\Gavin\Desktop\python\Users.py", line 242, in UserListener
-    betManager.endBet(codePart, winnerString)
-  File "C:\Users\Gavin\Desktop\python\bets.py", line 137, in endBet
-    bet.end(None, _winnerStr)
-  File "C:\Users\Gavin\Desktop\python\bets.py", line 216, in end
-    payoutsArr = betManager.calcPayout(self.optionsArray, _winningOption)
-  File "C:\Users\Gavin\Desktop\python\bets.py", line 88, in calcPayout
-    payoutRate = round(newTotalPool/optionPool[_winnerStr],2) # like 1.25 ie. this would be a 25% return
-ZeroDivisionError: division by zero
->>> 
+- update draft for manual locks and lock timer
 
 - draft use guide for v1
 - clean up settings files
@@ -22,7 +7,7 @@ ZeroDivisionError: division by zero
 
 - Add a time limit on abandoned bets
 
-/w gavin_test_bot !bet Who will win? [Red team, Orange Team, Blue] 120
+/w gavin_test_bot !bet Who will win? [Red team, Orange Team, Blue] 15
 
 
 !stake red team 20

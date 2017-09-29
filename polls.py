@@ -12,9 +12,11 @@ class pollManager(): # STATiC ONLY
 	def pollsChecker():
 		tnow = time.time()
 		if pollManager.lastTimeRun < tnow - POLL_CHECK_FREQUENCY:
+			print("checking for polls to end")
 			for pollObj in module_share.all_polls:
 				if pollObj.created+pollObj.timeoutSeconds < tnow:
 					pollObj.end()
+			pollManager.lastTimeRun = time.time()
 
 	def voteWasCast(_votingUserName, _verboseVote):
 		# check all options in all active polls

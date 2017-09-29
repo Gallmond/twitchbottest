@@ -191,9 +191,9 @@ class Users(): # ALWAYS CALL STATICALLY
 					timer = last[closeIndex+1:len(last)]# all chars after closing ]
 					timer = timer.strip() # if this is an empty string, no timer was passed in
 					if timer == "":
-						timer = int(timer)
-					else:
 						timer = -1
+					else:
+						timer = int(timer)
 
 					cleanOptions = []				
 					for option in optionsArr:
